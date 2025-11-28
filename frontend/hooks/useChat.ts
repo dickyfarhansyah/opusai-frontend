@@ -2,6 +2,7 @@ import * as React from "react";
 import ChatMessageType from "@/lib/type/chat_message";
 import { messageStore } from "@/lib/store/message_store";
 import { useConversationId, useCreateConversation, useSwitchConversation } from "./useConversation";
+import { fetchDummyModels } from "@/lib/api/models";
 
 
 interface useChatHook {
@@ -56,6 +57,27 @@ export function useSetShouldResponse() {
   return messageStore(state => state.setShouldResponse)
 }
 
+export function useSetPrompt() {
+  return messageStore(state => state.setPrompt)
+}
+
+export function useGetPrompt() {
+  return messageStore(state => state.prompt)
+}
+
+export function useFetchModels() {
+  const availableModels = useAvailableModels()
+  const loadModels = messageStore(state => state.loadModels)
+  const hasLoaded = React.useRef(false)
+
+  React.useEffect(() => {
+    if (availableModels.length === 0 && !hasLoaded.current) {
+      hasLoaded.current = true
+      loadModels()
+    }
+  }, [loadModels, availableModels.length])
+}
+
 export function useGetMessageForConv() {
   const messages = useMessages()
   const currentConversationId = useConversationId()
@@ -68,6 +90,23 @@ export function useGetMessageForConv() {
 
   return getMessageForConv
 }
+
+export function useAvailableModels() {
+  return messageStore(state => state.availableModels)
+}
+
+export function useSelectedModel() {
+  return messageStore(state => state.selectedModel)
+}
+
+export function useSetSelectedModel() {
+  return messageStore(state => state.setSelectedModel)
+}
+
+export function useIsLoadingModels() {
+  return messageStore(state => state.isLoadingModels)
+}
+
 
 export function useSendMessage() {
   const currentConversationId = useConversationId()
@@ -140,18 +179,19 @@ export function useAutoResponse() {
   const currentConversationId = useConversationId()
   const appendMessage = messageStore(state => state.appendMessage)
   const setShouldResponse = useSetShouldResponse()
-  const createEmptyMessageForStream = useCreateEmptyMessageForStream()
   const updateMessageChunk = useUpdateMessageChunk()
-  const isThinking = useIsThinking()
   const setIsThinking = useSetIsThinking()
-  const messageScratchpad = useMessageScratchpad()
   const setMessageScratchpad = useSetMessageScratchpad()
+  const selectedModel = useSelectedModel()
+  const selectedModelRef = React.useRef("")
+  selectedModelRef.current = selectedModel
 
   React.useEffect(() => {
     const delay = (ms:number) => new Promise(resolve => setTimeout(resolve, ms))
     if (shouldResponse && currentConversationId && !isResponding.current) {
       setShouldResponse(false)
       isResponding.current = true
+      console.log('Printing selected model: ', selectedModelRef.current)
 
       const dummy_responses = [
         "Short answer!",

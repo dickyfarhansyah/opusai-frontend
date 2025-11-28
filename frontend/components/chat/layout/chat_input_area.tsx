@@ -6,17 +6,14 @@ import {
   InputGroupButton,
   InputGroupTextarea,
 } from "@/components/ui/input-group";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ChevronDownIcon, DiscAlbum, FileIcon, SendIcon } from "lucide-react";
+import { SendIcon } from "lucide-react";
 import { KeyboardEvent, useState } from "react";
-import { useAutoResponse, useIsThinking, useSendMessage } from "@/hooks/useChat";
+import { useIsThinking, useSendMessage } from "@/hooks/useChat";
 import useDebounce from "@/hooks/useDebounce";
 import {redirect, RedirectType} from "next/navigation"
+import { ChatModelSwitch } from "../input/model_switch";
+import { ChatFileUpload } from "../input/file_upload";
+import { ChatPromptSwitch } from "../input/prompt_switch";
 
 
 export default function ChatInputArea({isRedirect=true} : {isRedirect?:boolean}) {
@@ -50,35 +47,11 @@ export default function ChatInputArea({isRedirect=true} : {isRedirect?:boolean})
             disabled={isThinking}
           />
           <InputGroupAddon align="block-end">
-            <InputGroupButton
-              size="icon-sm"
-              aria-label="upload file"
-              title="File"
-              disabled={isThinking}
-            >
-              <FileIcon />
-            </InputGroupButton>
+            <ChatFileUpload />
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <InputGroupButton
-                  id="selected-model"
-                  title="Change model"
-                  aria-label="Change model"
-                  disabled={isThinking}
-                >
-                  <div className="flex items-center">
-                    <ChevronDownIcon className="size-3" />
-                    <span className="text-xs pl-1.5">Models</span>
-                  </div>
-                </InputGroupButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem>Dummy model 1</DropdownMenuItem>
-                <DropdownMenuItem>Dummy model 2</DropdownMenuItem>
-                <DropdownMenuItem>Dummy model 3</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <ChatModelSwitch />
+
+            <ChatPromptSwitch />
 
             <InputGroupButton
               aria-label="send question"

@@ -4,6 +4,7 @@ import useChat from "@/hooks/useChat";
 import useConversation from "@/hooks/useConversation";
 import {redirect, RedirectType} from "next/navigation";
 import Link from "next/link";
+import { ChatPromptLayout } from "../prompt/prompt";
 
 export default function ChatSidebarHeader() {
   const {switchConversation} = useConversation()
@@ -30,6 +31,10 @@ export default function ChatSidebarHeader() {
               New chat
             </Link>
           </Button>
+          {/* <Button className="w-full justify-start p-0 text-md" variant="ghost">
+            Prompt
+          </Button> */}
+          <ChatPromptLayout />
         </li>
       </ul>
     </SidebarHeader>

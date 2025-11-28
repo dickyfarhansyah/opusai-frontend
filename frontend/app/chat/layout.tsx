@@ -10,14 +10,18 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import DarkModeToggle from "@/components/utils/darkmode-toggle";
 import ChatSidebarFooter from "@/components/chat/layout/sidebar_footer";
 import ChatSidebarHeader from "@/components/chat/layout/sidebar_header";
 import ChatSidebarContent from "@/components/chat/layout/sidebar_content";
-import { ChatAIThinking } from "@/components/chat/loading";
+import { useFetchModels } from "@/hooks/useChat";
+import { useFetchPrompts } from "@/hooks/usePrompt";
 
 export default function ChatLayout({ children }: { children: ReactNode }) {
+  useFetchModels();
+  useFetchPrompts();
+
   return (
     <SidebarProvider>
       <Sidebar>

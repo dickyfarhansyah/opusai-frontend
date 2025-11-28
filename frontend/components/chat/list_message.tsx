@@ -1,6 +1,6 @@
 import ChatMessageType from "@/lib/type/chat_message";
 import { ChatMessage } from "./chat_message";
-import { memo, useMemo } from "react";
+import { memo, useEffect, useMemo, useRef } from "react";
 import { useGetMessageForConv, useIsThinking, useMessageScratchpad } from "@/hooks/useChat";
 import { ChatAIThinking } from "./loading";
 
@@ -9,8 +9,13 @@ const ChatListMessage = memo(function ChatListMessage() {
   const messages:ChatMessageType[] = useGetMessageForConv()
   const messageScratchpad = useMessageScratchpad()
   const isThinking = useIsThinking()
+  const latestChat = useRef<HTMLDivElement>(null)
   const renderedMessages = useMemo(() => {
     return messages.map((e) => (<ChatMessage key={e.id} id={e.id} role={e.role} message={e.message}/>))
+  }, [messages])
+
+  useEffect(() => {
+    latestChat.current?.scrollIntoView({behavior:'smooth'})
   }, [messages])
   return (
     <>
@@ -28,6 +33,7 @@ const ChatListMessage = memo(function ChatListMessage() {
         )}
       </div>
     )}
+    <div ref={latestChat} />
     </>
   )
 })

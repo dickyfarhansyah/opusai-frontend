@@ -1,12 +1,17 @@
 import { create } from "zustand";
 import ChatMessageType from "../type/chat_message";
+import { fetchDummyModels } from "../api/models";
 
 interface MessageStoreState {
   messages: ChatMessageType[];
   shouldResponse:boolean;
   streamingMessageId:string | null;
   isThinking:boolean;
-  messageScratchpad:string
+  messageScratchpad:string;
+  availableModels:string[];
+  selectedModel:string;
+  isLoadingModels: boolean;
+  prompt: string
   createEmptyMessageForStream: (conversationId:string) => string;
   updateMessageChunk: ({id, chunk}: {id:string, chunk:string}) => void;
   appendMessage: ({
@@ -22,6 +27,10 @@ interface MessageStoreState {
   setIsThinking: (e:boolean) => void;
   setStreamingMessageId: (id:string | null) => void;
   setMessageScratchpad: (value:string) => void;
+  setSelectedModel: (model:string) => void;
+  setAvailableModels: (models:string[]) => void;
+  loadModels: () => Promise<void>;
+  setPrompt: (prompt:string) => void;
 }
 
 const appendMessageFunc = ({state, role, message, conversationId, id,} : {state:MessageStoreState, role:"assistant" | 'user', message:string, conversationId:string, id?:string}) => {
@@ -45,6 +54,10 @@ export const messageStore = create<MessageStoreState>((set, get) => ({
   isThinking: false,
   streamingMessageId:null,
   messageScratchpad:"",
+  availableModels: [],
+  selectedModel: "",
+  isLoadingModels: false,
+  prompt:"",
   updateMessageChunk: ({id, chunk}: {id:string, chunk:string}) => {
     set((state) => {
       return {messages:state.messages.map((msg) => {
@@ -86,8 +99,22 @@ export const messageStore = create<MessageStoreState>((set, get) => ({
       return appendMessageFunc(params)
     }),
     shouldResponse: false,
-    setShouldResponse: (e:boolean) => set((state) => ({shouldResponse: e})),
-    setIsThinking: (e:boolean) => set((state) => ({isThinking: e})),
+    setShouldResponse: (e:boolean) => set({shouldResponse: e}),
+    setIsThinking: (e:boolean) => set({isThinking: e}),
     setStreamingMessageId: (id:string | null) => set({streamingMessageId: id}),
-    setMessageScratchpad: (value:string) => set({messageScratchpad: value})
+    setMessageScratchpad: (value:string) => set({messageScratchpad: value}),
+    setAvailableModels: (models:string[]) => set({availableModels:models, selectedModel:get().selectedModel || models[0] || ""}),
+    setSelectedModel: (model:string) => set({selectedModel:model}),
+    loadModels: async () => {
+      set({isLoadingModels:true})
+      try {
+        const models = await fetchDummyModels()
+        get().setAvailableModels(models)
+      } catch(error) {
+        console.error("Cannot fetch models: ", error)
+      } finally {
+        set({isLoadingModels:false})
+      }
+    },
+    setPrompt: (prompt:string) => set({prompt:prompt})
 }));
