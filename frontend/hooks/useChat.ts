@@ -183,7 +183,10 @@ export function useAutoResponse() {
   const setIsThinking = useSetIsThinking()
   const setMessageScratchpad = useSetMessageScratchpad()
   const selectedModel = useSelectedModel()
+  const prompt = useGetPrompt()
   const selectedModelRef = React.useRef("")
+  const selectedPromptRef = React.useRef("")
+  selectedPromptRef.current = prompt
   selectedModelRef.current = selectedModel
 
   React.useEffect(() => {
@@ -192,6 +195,7 @@ export function useAutoResponse() {
       setShouldResponse(false)
       isResponding.current = true
       console.log('Printing selected model: ', selectedModelRef.current)
+      console.log('Printing used prompt: ', selectedPromptRef.current)
 
       const dummy_responses = [
         "Short answer!",
