@@ -184,10 +184,14 @@ export function useAutoResponse() {
   const setMessageScratchpad = useSetMessageScratchpad()
   const selectedModel = useSelectedModel()
   const prompt = useGetPrompt()
+  const files = useGetFiles()
+  const removeFile = useRemoveFile()
   const selectedModelRef = React.useRef("")
   const selectedPromptRef = React.useRef("")
+  const uploadedFiles = React.useRef<File[]>([])
   selectedPromptRef.current = prompt
   selectedModelRef.current = selectedModel
+  uploadedFiles.current = files
 
   React.useEffect(() => {
     const delay = (ms:number) => new Promise(resolve => setTimeout(resolve, ms))
@@ -196,6 +200,13 @@ export function useAutoResponse() {
       isResponding.current = true
       console.log('Printing selected model: ', selectedModelRef.current)
       console.log('Printing used prompt: ', selectedPromptRef.current)
+      console.log('Printing uploaded files: ', uploadedFiles.current.length)
+
+      if (uploadedFiles.current) {
+        uploadedFiles.current.forEach((_, idx) => {
+          removeFile(idx)
+        })
+      }
 
       const dummy_responses = [
         "Short answer!",
@@ -237,3 +248,22 @@ export function useAutoResponse() {
   }, [shouldResponse, currentConversationId, setShouldResponse, appendMessage, updateMessageChunk, setMessageScratchpad])
 }
 
+export function useGetFiles() {
+  return messageStore(state => state.files)
+}
+
+export function useAppendFile() {
+  return messageStore(state => state.appendFile)
+}
+
+export function useRemoveFile() {
+  return messageStore(state => state.removeFile)
+}
+
+export function useParameterSettings() {
+  return messageStore(state => state.parameter)
+}
+
+export function useSetParameterSettings() {
+  return messageStore(state => state.setParameter)
+}

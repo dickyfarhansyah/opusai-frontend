@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import ChatMessageType from "../type/chat_message";
 import { fetchDummyModels } from "../api/models";
+import { ChatParameterSettingsType } from "../type/chat_parameter";
+import { ChatParameterSettings } from "@/components/chat/input/parameter_settings";
 
 interface MessageStoreState {
   messages: ChatMessageType[];
@@ -12,6 +14,8 @@ interface MessageStoreState {
   selectedModel:string;
   isLoadingModels: boolean;
   prompt: string
+  files: File[]
+  parameter: ChatParameterSettingsType
   createEmptyMessageForStream: (conversationId:string) => string;
   updateMessageChunk: ({id, chunk}: {id:string, chunk:string}) => void;
   appendMessage: ({
@@ -31,6 +35,9 @@ interface MessageStoreState {
   setAvailableModels: (models:string[]) => void;
   loadModels: () => Promise<void>;
   setPrompt: (prompt:string) => void;
+  appendFile: (file:File) => void;
+  removeFile: (index:number) => void;
+  setParameter: ({temperature}:ChatParameterSettingsType) => void;
 }
 
 const appendMessageFunc = ({state, role, message, conversationId, id,} : {state:MessageStoreState, role:"assistant" | 'user', message:string, conversationId:string, id?:string}) => {
@@ -58,6 +65,8 @@ export const messageStore = create<MessageStoreState>((set, get) => ({
   selectedModel: "",
   isLoadingModels: false,
   prompt:"",
+  files: [],
+  parameter: {temperature:0.7},
   updateMessageChunk: ({id, chunk}: {id:string, chunk:string}) => {
     set((state) => {
       return {messages:state.messages.map((msg) => {
@@ -116,5 +125,10 @@ export const messageStore = create<MessageStoreState>((set, get) => ({
         set({isLoadingModels:false})
       }
     },
-    setPrompt: (prompt:string) => set({prompt:prompt})
+    setPrompt: (prompt:string) => set({prompt:prompt}),
+    appendFile: (file:File) => set((state) => ({files: [...state.files, file]})),
+    removeFile: (index:number) => set((state) => {
+      return {files: state.files.filter((_, i) => i !== index)}
+    }),
+    setParameter: ({temperature}:ChatParameterSettingsType) => set({parameter: {temperature}})
 }));

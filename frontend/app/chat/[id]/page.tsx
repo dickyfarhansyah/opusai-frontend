@@ -1,6 +1,7 @@
 'use client'
 import ChatInputArea from "@/components/chat/layout/chat_input_area";
 import { ChatListMessage } from "@/components/chat/list_message";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAutoResponse } from "@/hooks/useChat";
 import { useConversationId, useSwitchConversation } from "@/hooks/useConversation";
 import { useEffect } from "react";
@@ -19,11 +20,13 @@ export default function ChatUserPage(
   }, [currentConversationId, switchConversation])
   return (
     <>
-    <div className="flex-1 overflow-y-auto p-4">
+    {/* <div className="flex-1 overflow-y-auto p-4"> */}
+    <ScrollArea className="flex-1 p-4 overflow-y-auto">
       <div className="mx-auto space-y-4 max-w-3xl p-5">
         <ChatListMessage />
       </div>
-    </div>
+    </ScrollArea>
+    {/* </div> */}
     <ChatInputArea isRedirect={false}/>
     </>
   );

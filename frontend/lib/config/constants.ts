@@ -1,0 +1,3 @@
+export const MAX_FILE_UPLOAD_SIZE = 5 * 1024 * 1024 //5 Mb
+export const MAX_FILE_UPLOAD_COUNT = 3 //strictly limit to 3 files
+export const ALLOWED_MIME_CHAT_UPLOAD_FILE = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain']

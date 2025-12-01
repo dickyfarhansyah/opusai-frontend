@@ -2,11 +2,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger, DialogContent, DialogClose, DialogFooter, DialogTitle, DialogDescription, DialogHeader } from "@/components/ui/dialog";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupTextarea } from "@/components/ui/input-group";
-import { useSetPrompt } from "@/hooks/useChat";
+import { InputGroup, InputGroupTextarea } from "@/components/ui/input-group";
 import { useAvailablePrompts } from "@/hooks/usePrompt";
-import { ArrowUp, PencilIcon } from "lucide-react";
-import { memo, useCallback, useState } from "react";
+import { memo, useState } from "react";
 
 
 
