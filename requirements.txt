@@ -1,9 +1,0 @@
-fastapi
-dotenv
-openai
-qdrant-client
-pymilvus
-pdfplumber
-langchain-text-splitters
-python-docx
-pydantic
