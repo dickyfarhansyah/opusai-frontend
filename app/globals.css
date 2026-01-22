@@ -73,7 +73,8 @@
   --accent-foreground: oklch(0.28 0.019 249);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.922 0 0);
+  /* --border: oklch(0.922 0 0); */
+  --border: oklch(0.7694 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
   --chart-1: oklch(0.646 0.222 41.116);
@@ -340,7 +341,8 @@ html.Inter * {
   --destructive-foreground: oklch(0.98 0.020 85.87);
   
   /* Borders and inputs - Clear boundaries */
-  --border: oklch(0.84 0.060 85.87);
+  /* --border: oklch(0.84 0.060 85.87); */
+  --border: oklch(0.7665 0.113 85.87);
   --input: oklch(0.86 0.065 85.87);
   --ring: oklch(0.578 0.141 241.043 / 50%);
   

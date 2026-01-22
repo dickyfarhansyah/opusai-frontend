@@ -10,11 +10,6 @@ import {
 	useFetchConversations,
 	useSwitchConversation,
 } from "./useConversation";
-import { fetchDummyModels } from "@/lib/api/models";
-import {
-	fetchConversationMessages,
-	fetchConversationTitle,
-} from "@/lib/api/conversations";
 import { fetchChat } from "@/lib/api/chat";
 import { useAppendError } from "./useError";
 import { useRouter } from "next/navigation";
@@ -35,8 +30,6 @@ export default function useChat(): useChatHook {
 	const setShouldResponse = useSetShouldResponse();
 	const getMessageForConv = useGetMessageForConv();
 	const sendMessage = useSendMessage();
-
-	useAutoResponse();
 
 	return {
 		messages,
@@ -120,35 +113,30 @@ export function useConversationMessages() {
 		(state) => state.getConversationMessages,
 	);
 	const isStreaming = useIsStreaming();
+	const isProcessing = useIsProcessing();
+	const prevConvIdRef = React.useRef<string | null>(null);
 
 	React.useEffect(() => {
-		if (currentConversationId && !isStreaming) {
+		const conversationChanged = prevConvIdRef.current !== currentConversationId;
+		prevConvIdRef.current = currentConversationId;
+
+		if (!conversationChanged) {
+			return;
+		}
+
+		if (currentConversationId && !isStreaming && !isProcessing) {
 			getConversationMessages(currentConversationId);
-		} else if (currentConversationId === null && !isStreaming) {
+		} else if (currentConversationId === null) {
 			clearMessages();
 		}
 	}, [
 		currentConversationId,
 		getConversationMessages,
 		isStreaming,
+		isProcessing,
 		clearMessages,
 	]);
 }
-
-// function below is commented because of integration, later if want to work with UI use this function
-// export function useGetMessageForConv() {
-//   const messages = useMessages()
-//   const currentConversationId = useConversationId()
-//   const getMessageForConv = React.useMemo(() => {
-//     if (!currentConversationId) {
-//       return []
-//     }
-//     // return messages.filter(msg => msg.conversationId === currentConversationId)
-//     return messages
-//   }, [messages, currentConversationId])
-
-//   return getMessageForConv
-// }
 
 // Integrated to backend
 export function useGetMessageForConv() {
@@ -212,7 +200,8 @@ export function useChatAPI() {
 			const chunk = chunkQueueRef.current.shift()!;
 			setMessageScratchpad((prev) => prev + chunk);
 
-			setTimeout(processNext, 30); // 30ms between chunks
+			// setTimeout(processNext, 30); // 30ms to stop react batch render (original solution)
+			requestAnimationFrame(processNext); //trying to fix stream starts after completion
 		};
 
 		processNext();
@@ -252,7 +241,7 @@ export function useChatAPI() {
 					system_prompt_id: prompt_id,
 					temperature: parameter.temperature,
 					stream: true,
-					task_type: "chat" as const,
+					tool_choice: "auto" as const,
 					db_connect: false,
 					onStart: (data: ChatStartData) => {
 						setIsStreaming(true);
@@ -279,13 +268,6 @@ export function useChatAPI() {
 								}
 							}
 						}, 50);
-						// if (chunkQueueRef.current.length === 0 && !processingRef.current) {
-						//   setIsStreaming(false)
-						//   // setIsThinking(false)
-						//   if (onComplete) {
-						//     onComplete(data)
-						//   }
-						// }
 					},
 					onError: (error: string) => {
 						setIsStreaming(false);
@@ -294,7 +276,6 @@ export function useChatAPI() {
 						processingRef.current = false;
 						messageStore.getState().setMessageScratchpad("");
 
-						// throw new Error(error !== null || undefined ? error : "API Error")
 						appendError(error || "Stream error");
 					},
 				};
@@ -309,7 +290,7 @@ export function useChatAPI() {
 						? error.message
 						: "Failed to send chat request";
 				setIsThinking(false);
-				chunkQueueRef.current = []; // ✅ Clear queue on error
+				chunkQueueRef.current = [];
 				processingRef.current = false;
 				appendError(errMsg);
 			} finally {
@@ -391,20 +372,14 @@ export function useSendMessage() {
 						}
 					},
 					async (data: ChatCompletionData) => {
-						// updateUserMessageId(tempUserMsgId, data.input_id)
-						// if (!activeConvId && data.conversation_id) {
-						//   const conversationTitle = await fetchConversationTitle(data.conversation_id)
-						//   createConversation(conversationTitle || message.slice(0,50), data.conversation_id)
-						//   switchConversation(data.conversation_id)
-						//   activeConvId = data.conversation_id
-						//   router.replace(`/chat/${data.conversation_id}`)
-						// }
+						await new Promise((resolve) => setTimeout(resolve, 100));
 						const completeMessage = messageStore.getState().messageScratchpad;
 						appendMessage({
 							conversationId: data.conversation_id,
 							role: "assistant",
 							id: data.message_id,
 							message: completeMessage,
+							references: data.references,
 						});
 						messageStore.getState().setMessageScratchpad("");
 					},
@@ -412,38 +387,6 @@ export function useSendMessage() {
 				if (!result && !stream) {
 					throw new Error("Failed to send chat");
 				}
-				// updateUserMessageId(tempUserMsgId, result.input_id)
-				// const conversationTitle = await fetchConversationTitle(result.conversation_id)
-
-				// if (!activeConvId && result.conversation_id) {
-				//   createConversation(conversationTitle || message.slice(0, 50), result.conversation_id)
-				//   switchConversation(result.conversation_id)
-				//   activeConvId = result.conversation_id
-				//   router.replace(`/chat/${result.conversation_id}`)
-				// }
-
-				// setIsStreaming(true)
-				// const words = result.response.content.split(' ')
-				// let accumulated:string = ''
-				// for (let i=0; i < words.length; i++) {
-				//   accumulated += (i > 0 ? ' ' : '') + words[i]
-				//   setMessageScratchpad(accumulated)
-
-				//   await delay(20+Math.random() * 60)
-				// }
-				// setIsStreaming(false)
-
-				// if (result.response.content) {
-				//   setMessageScratchpad('')
-				//   appendMessage({
-				//     conversationId:activeConvId!,
-				//     role:'assistant',
-				//     message:result.response.content,
-				//     id:result.response.response_id
-				//   })
-				// }
-
-				// return activeConvId
 			} catch (error) {
 				const errMsg =
 					error instanceof Error
@@ -452,11 +395,9 @@ export function useSendMessage() {
 				appendError(errMsg);
 				setIsProcessing(false);
 				setIsStreaming(false);
-				// return null
 			} finally {
 				setIsProcessing(false);
 			}
-			// }, [currentConversationId, createConversation, setIsStreaming, switchConversation, appendMessage, setShouldResponse, sendChatMessage, setMessageScratchpad, updateUserMessageId, isProcessing,setIsProcessing, router, appendError]
 		},
 		[
 			currentConversationId,
@@ -497,92 +438,6 @@ export function useMessageScratchpad() {
 
 export function useSetMessageScratchpad() {
 	return messageStore((state) => state.setMessageScratchpad);
-}
-
-// this should not be needed anymore, all of the responses logic is moved to useSendMessage
-export function useAutoResponse() {
-	const isResponding = React.useRef(false);
-	const shouldResponse = useShouldResponse();
-	const currentConversationId = useConversationId();
-	const appendMessage = messageStore((state) => state.appendMessage);
-	const setShouldResponse = useSetShouldResponse();
-	const updateMessageChunk = useUpdateMessageChunk();
-	const setIsThinking = useSetIsThinking();
-	const setMessageScratchpad = useSetMessageScratchpad();
-	const selectedModel = useSelectedModel();
-	const prompt = useGetPrompt();
-	const files = useGetFiles();
-	const removeFile = useRemoveFile();
-	const selectedModelRef = React.useRef("");
-	const selectedPromptRef = React.useRef("");
-	const uploadedFiles = React.useRef<File[]>([]);
-	selectedPromptRef.current = prompt;
-	selectedModelRef.current = selectedModel;
-	uploadedFiles.current = files;
-
-	React.useEffect(() => {
-		const delay = (ms: number) =>
-			new Promise((resolve) => setTimeout(resolve, ms));
-		if (shouldResponse && currentConversationId && !isResponding.current) {
-			setShouldResponse(false);
-			isResponding.current = true;
-			console.log("Printing selected model: ", selectedModelRef.current);
-			console.log("Printing used prompt: ", selectedPromptRef.current);
-			console.log("Printing uploaded files: ", uploadedFiles.current.length);
-
-			if (uploadedFiles.current) {
-				uploadedFiles.current.forEach((_, idx) => {
-					removeFile(idx);
-				});
-			}
-
-			const dummy_responses = [
-				"Short answer!",
-				"This is a medium-length response that provides a bit more context.",
-				"This is a much longer response that goes into detail about various topics and simulates what a real assistant might say when asked a complex question...",
-				"Lorem ipsum dolor sit amet consectetur adipisicing elit. Itaque nisi, quos obcaecati praesentium ut eveniet? Ex explicabo laudantium laboriosam consequuntur mollitia blanditiis asperiores corrupti unde autem magni? Exercitationem, ea eaque.",
-			];
-
-			const simulateFetch = async () => {
-				setIsThinking(true);
-				await delay(5000);
-				const resp =
-					dummy_responses[Math.floor(Math.random() * dummy_responses.length)];
-				return resp;
-			};
-
-			const simulateStreaming = async () => {
-				const resp = await simulateFetch();
-				const words = resp.split(" ");
-
-				setIsThinking(false);
-				let accumulated: string = "";
-				for (let i = 0; i < words.length; i++) {
-					accumulated += (i > 0 ? " " : "") + words[i];
-					setMessageScratchpad(accumulated);
-
-					await delay(20 + Math.random() * 60);
-				}
-				appendMessage({
-					conversationId: currentConversationId,
-					role: "assistant",
-					message: accumulated,
-				});
-				setMessageScratchpad("");
-				isResponding.current = false;
-			};
-
-			simulateStreaming();
-		}
-	}, [
-		shouldResponse,
-		currentConversationId,
-		setShouldResponse,
-		appendMessage,
-		setMessageScratchpad,
-		removeFile,
-		setIsThinking,
-	]);
 }
 
 export function useGetFiles() {
