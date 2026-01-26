@@ -7,8 +7,59 @@ import {
 } from "../ui/accordion";
 import { Button } from "../ui/button";
 import { ScrollArea } from "../ui/scroll-area";
+import { useState } from "react";
+import { GroupButtonSection } from "./group_button_section";
+import { FilterSection } from "./filter_section";
+
+const dummyGroup = [
+	{
+		name: "Group akta jual beli dummy",
+		description: "Some description for this group",
+		id: crypto.randomUUID(),
+		field_schemas: [
+			{
+				id: crypto.randomUUID(),
+				name: "penjual",
+				description: "Some description for penjual field",
+			},
+			{
+				id: crypto.randomUUID(),
+				name: "pembeli",
+				description: "Some description for pembeli field",
+			},
+			{
+				id: crypto.randomUUID(),
+				name: "notaris",
+				description: "Some description for notaris field",
+			},
+		],
+	},
+	{
+		name: "Group undang undang dummy",
+		description: "Some description for this group undang undang",
+		id: crypto.randomUUID(),
+		field_schemas: [
+			{
+				id: crypto.randomUUID(),
+				name: "judul",
+				description: "Some description for judul field",
+			},
+			{
+				id: crypto.randomUUID(),
+				name: "penerbit",
+				description: "Some description for penerbit field",
+			},
+			{
+				id: crypto.randomUUID(),
+				name: "tahun",
+				description: "Some description for tahun field",
+			},
+		],
+	},
+];
 
 export function KeywordSection() {
+	const [selectedGroup, setSelectedGroup] = useState<string>(dummyGroup[0].id);
 	return (
 		<Accordion
 			type="single"
@@ -28,14 +79,11 @@ export function KeywordSection() {
 						</div>
 						<div className="flex-1 overflow-hidden">
 							<ScrollArea className="h-full w-full">
-								<div className="flex flex-col gap-2 p-4">
-									<Button>Badut</Button>
-									<Button>Badut</Button>
-									<Button>Badut</Button>
-									<Button>Badut</Button>
-									<Button>Badut</Button>
-									<Button>Badut</Button>
-								</div>
+								<GroupButtonSection
+									groups={dummyGroup}
+									display={selectedGroup}
+									onChangeDisplay={setSelectedGroup}
+								/>
 							</ScrollArea>
 						</div>
 					</div>
@@ -48,15 +96,10 @@ export function KeywordSection() {
 						</div>
 						<div className="flex-1 overflow-hidden">
 							<ScrollArea className="h-full w-full">
-								<div className="flex flex-col gap-2 p-4">
-									<div>test field</div>
-									<div>test field</div>
-									<div>test field</div>
-									<div>test field</div>
-									<div>test field</div>
-									<div>test field</div>
-									<div>test field</div>
-								</div>
+								<FilterSection
+									groups={dummyGroup}
+									selectedGroup={selectedGroup}
+								/>
 							</ScrollArea>
 						</div>
 					</div>

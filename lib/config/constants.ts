@@ -10,3 +10,4 @@ export const ALLOWED_MIME_CHAT_UPLOAD_FILE = [
 	"application/csv",
 ];
 export const BASE_URL = "http://192.168.99.22:3000/";
+// export const BASE_URL = "http://localhost:3000/";
