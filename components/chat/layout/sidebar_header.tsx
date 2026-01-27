@@ -49,7 +49,7 @@ export default function ChatSidebarHeader() {
 						<SquareArrowOutUpRightIcon className="h-4 w-4" />
 						New chat
 					</Button>
-					<Separator orientation={"horizontal"} className="mt-2" />
+					<Separator orientation={"horizontal"} className="my-2" />
 					<Link href="/settings/general">
 						<Button
 							className="w-full text-md justify-start hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
