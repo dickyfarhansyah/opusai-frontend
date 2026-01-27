@@ -621,6 +621,14 @@ html.Inter * {
   box-shadow: 0 0 10px var(--destructive);
 }
 
+span.search-highlight {
+  background-color: var(--color-accent);
+  color: var(--color-accent-foreground);
+  font-weight: bold;
+  padding: 0.2rem;
+  border-radius: 0.25rem;
+}
+
 @layer base {
   * {
     @apply border-border;

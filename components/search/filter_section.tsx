@@ -1,27 +1,25 @@
+import type { FetchSmartSearchSchemaResponse } from "@/lib/type/smartsearch";
 import { memo, useMemo } from "react";
 
 const FilterSection = memo(function FilterSection({
 	groups,
 	selectedGroup,
 }: {
-	groups: {
-		name: string;
-		description: string;
-		id: string;
-		field_schemas: { id: string; name: string; description: string }[];
-	}[];
+	groups: FetchSmartSearchSchemaResponse;
 	selectedGroup: string;
 }) {
 	const selectedFieldSchemas = useMemo(() => {
-		return groups.find((e) => e.id === selectedGroup)?.field_schemas;
+		return groups.schemas.find((e) => e.id === selectedGroup)?.field_schemas;
 	}, [groups, selectedGroup]);
 	return (
 		<div className="flex flex-col gap-2 p-4">
 			{selectedFieldSchemas ? (
 				selectedFieldSchemas.map((e) => (
-					<div key={e.id}>
-						<h4 className="text-base font-semibold capitalize">{e.name}</h4>
-						<p className="text-sm font-light">{e.description}</p>
+					<div key={e.id} className="border p-2 rounded-lg">
+						<div className="flex flex-row items-center justify-between">
+							<h4 className="text-base font-semibold capitalize">{e.name}</h4>
+							<h4 className="text-xs capitalize">({e.type})</h4>
+						</div>
 					</div>
 				))
 			) : (

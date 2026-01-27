@@ -1,17 +1,19 @@
 "use client";
 
-import { ChatMessage } from "@/components/chat/chat_message";
-import { FileReference } from "@/components/chat/files/file_reference";
 import {
 	EmptyResultBox,
 	GuideModal,
 	KeywordSection,
+	ResultBox,
 	SearchInputBox,
 } from "@/components/search";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { useGetIsSearching, useGetSearchHits } from "@/hooks/useSmartsearch";
 
 export default function SearchPage() {
+	const isSearching = useGetIsSearching();
+	const hits = useGetSearchHits();
 	return (
 		<ScrollArea className="h-full">
 			<div className="flex flex-col gap-4 py-4 w-xs md:w-lg lg:w-2xl xl:w-4xl mx-auto h-full">
@@ -31,8 +33,10 @@ export default function SearchPage() {
 						</p>
 					</div>
 				</div>
-				<div className="flex p-4 rounded-lg border h-64">
-					<EmptyResultBox />
+				<div className="flex p-4 rounded-lg border min-h-64 max-h-128">
+					<ScrollArea className="flex min-w-full min-h-full">
+						{hits.length > 0 ? <ResultBox /> : <EmptyResultBox />}
+					</ScrollArea>
 				</div>
 			</div>
 		</ScrollArea>
