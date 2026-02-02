@@ -4,7 +4,8 @@ import rehypeHighlight from "rehype-highlight";
 import remarkGfm from "remark-gfm";
 import { FileReference } from "./files/file_reference";
 import { CopyButton } from "../utils/copy_button";
-import type { RefType } from "@/lib/type/chat_message";
+import type { RefType, UserRefType } from "@/lib/type/chat_message";
+import { UserChatFile } from "./files/files";
 
 const ChatMessage = memo(function ChatMessage({
 	id,
@@ -15,42 +16,40 @@ const ChatMessage = memo(function ChatMessage({
 	id: string;
 	sender: "assistant" | "user";
 	message: string;
-	references?: RefType[];
+	references?: RefType[] | UserRefType[];
 }) {
 	console.log(`im rendered ${id}`);
 
 	const memoizedReference = useMemo(() => {
 		if (references && references.length >= 0) {
-			return references.map((e) => {
-				if (e.source_type === "uploaded_file") {
-					return (
-						<FileReference
-							key={crypto.randomUUID()}
-							reference={e}
-							variant="non-active"
-						/>
-					);
-				}
-				if (e.source_type === "knowledge_base") {
-					return <FileReference key={e.source_id} reference={e} />;
-				}
-				if (e.source_type === "tabular") {
-					return (
-						<FileReference
-							key={crypto.randomUUID()}
-							reference={e}
-							variant="non-active"
-						/>
-					);
-				}
-				return null;
-			});
+			if (sender === "assistant") {
+				const refs = references as RefType[];
+				return refs.map((e) => {
+					if (e.source_type === "knowledge_base") {
+						return <FileReference key={e.source_id} reference={e} />;
+					} else if (["uploaded_file", "tabular"].includes(e.source_type)) {
+						return (
+							<FileReference
+								key={crypto.randomUUID()}
+								reference={e}
+								variant="non-active"
+							/>
+						);
+					}
+					return null;
+				});
+			} else {
+				const refs = references as UserRefType[];
+				return refs.map((e) => (
+					<UserChatFile key={crypto.randomUUID()} file={e.file} />
+				));
+			}
 		}
 		return null;
-	}, [references]);
+	}, [references, sender]);
 
 	return (
-		<>
+		<div className="flex flex-col">
 			{sender === "assistant" ? (
 				<div className="flex flex-col justify-start">
 					<div
@@ -82,17 +81,20 @@ const ChatMessage = memo(function ChatMessage({
 				</div>
 			) : (
 				<div className="flex justify-end">
-					<div
-						className="chat-message user-message p-3 max-w-[80%] warp-break-word rounded-xl prose"
-						id={id}
-					>
-						<ReactMarkdown rehypePlugins={[rehypeHighlight]}>
-							{message}
-						</ReactMarkdown>
+					<div className="flex flex-col gap-y-2">
+						{memoizedReference}
+						<div
+							className="chat-message user-message p-3 max-w-[80%] warp-break-word rounded-xl prose"
+							id={id}
+						>
+							<ReactMarkdown rehypePlugins={[rehypeHighlight]}>
+								{message}
+							</ReactMarkdown>
+						</div>
 					</div>
 				</div>
 			)}
-		</>
+		</div>
 	);
 });
 

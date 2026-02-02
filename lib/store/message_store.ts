@@ -1,5 +1,9 @@
 import { create } from "zustand";
-import ChatMessageType, { RefType } from "../type/chat_message";
+import type {
+	ChatMessageType,
+	RefType,
+	UserRefType,
+} from "../type/chat_message";
 import { fetchDummyModels, fetchModels } from "../api/models";
 import { ChatParameterSettingsType } from "../type/chat_parameter";
 import { ChatParameterSettings } from "@/components/chat/input/parameter_settings";
@@ -43,7 +47,7 @@ interface MessageStoreState {
 		role: "assistant" | "user";
 		message: string;
 		id?: string;
-		references?: RefType[];
+		references?: RefType[] | UserRefType[];
 	}) => void;
 	setShouldResponse: (e: boolean) => void;
 	setIsThinking: (e: boolean) => void;
@@ -78,7 +82,7 @@ const appendMessageFunc = ({
 	message: string;
 	conversationId: string;
 	id?: string;
-	references?: RefType[];
+	references?: RefType[] | UserRefType[];
 }) => {
 	const last_msg: ChatMessageType = state.messages[state.messages.length - 1];
 	if (
@@ -88,13 +92,29 @@ const appendMessageFunc = ({
 	) {
 		return state;
 	}
-	const new_message: ChatMessageType = {
-		id: id ? id : crypto.randomUUID(),
-		conversationId: conversationId,
-		role: role,
-		content: message,
-		references: references ? references : [],
-	};
+	// const new_message: ChatMessageType = {
+	// 	id: id ? id : crypto.randomUUID(),
+	// 	conversationId: conversationId,
+	// 	role: role,
+	// 	content: message,
+	// 	references: references ? references : [],
+	// };
+	const new_message: ChatMessageType =
+		role === "assistant"
+			? {
+					id: id ?? crypto.randomUUID(),
+					conversationId: conversationId,
+					role: role,
+					content: message,
+					references: (references as RefType[]) ?? [],
+				}
+			: {
+					id: id ?? crypto.randomUUID(),
+					conversationId: conversationId,
+					role: role,
+					content: message,
+					references: (references as UserRefType[]) ?? [],
+				};
 	return {
 		messages: [...state.messages, new_message],
 	};
@@ -157,7 +177,7 @@ export const messageStore = create<MessageStoreState>()(
 				role: "assistant" | "user";
 				message: string;
 				id?: string;
-				references?: RefType[];
+				references?: RefType[] | UserRefType[];
 			}) => {
 				set((state) => ({
 					messages: appendMessageFunc({
