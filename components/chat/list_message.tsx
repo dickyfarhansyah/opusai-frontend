@@ -1,4 +1,4 @@
-import type ChatMessageType from "@/lib/type/chat_message";
+import type { ChatMessageType } from "@/lib/type/chat_message";
 import { ChatMessage } from "./chat_message";
 import { memo, useEffect, useMemo, useRef } from "react";
 import {

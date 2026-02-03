@@ -1,7 +1,7 @@
 import { error } from "console";
 // import { BASE_URL } from "../config/constants";
 import { ChatConversationType } from "../type/conversation";
-import ChatMessageType from "../type/chat_message";
+import type { ChatMessageType } from "../type/chat_message";
 
 interface ConversationSchema {
 	id: string;
