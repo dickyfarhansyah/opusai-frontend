@@ -1,10 +1,19 @@
-export default interface ChatMessageType {
+export type ChatMessageType = {
 	id: string;
 	conversationId: string;
 	role: "assistant" | "user";
 	content: string;
-	references?: RefType[];
-}
+	// references?: RefType[];
+} & (
+	| {
+			role: "assistant";
+			references?: RefType[];
+	  }
+	| {
+			role: "user";
+			references?: UserRefType[];
+	  }
+);
 
 export type ChatChunkData = {
 	message_id: string;
@@ -65,6 +74,10 @@ export type RefType = {
 			location: UploadedFileLocationType;
 	  }
 );
+
+export type UserRefType = {
+	file: File;
+};
 
 export type ChatCompletionData = {
 	message_id: string;

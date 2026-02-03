@@ -65,7 +65,7 @@ export default function ChatSidebarHeader() {
 							variant="ghost"
 						>
 							<Search className="h-4 w-4 p-0" />
-							Archive search
+							Smart file search
 						</Button>
 					</Link>
 				</li>

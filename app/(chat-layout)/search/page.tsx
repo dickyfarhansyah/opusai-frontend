@@ -10,10 +10,19 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useGetIsSearching, useGetSearchHits } from "@/hooks/useSmartsearch";
+import { useEffect, useRef } from "react";
 
 export default function SearchPage() {
 	const isSearching = useGetIsSearching();
-	const hits = useGetSearchHits();
+	// const hits = useGetSearchHits();
+	const hasLoadedRef = useRef(false);
+
+	useEffect(() => {
+		if (!hasLoadedRef.current && isSearching) {
+			hasLoadedRef.current = true;
+		}
+	}, [isSearching]);
+
 	return (
 		<ScrollArea className="h-full">
 			<div className="flex flex-col gap-4 py-4 w-xs md:w-lg lg:w-2xl xl:w-4xl mx-auto h-full">
@@ -27,16 +36,17 @@ export default function SearchPage() {
 				</header>
 				<div className="flex rounded-lg border px-4 py-4 items-center">
 					<div className="flex flex-col w-full gap-y-2">
+						<h1 className="text-lg">Search query</h1>
 						<SearchInputBox />
 						<p className="text-xs text-muted-foreground">
 							Type naturally, let our AI extract the keyword and filters.
 						</p>
 					</div>
 				</div>
-				<div className="flex p-4 rounded-lg border min-h-64 max-h-128">
-					<ScrollArea className="flex min-w-full min-h-full">
-						{hits.length > 0 ? <ResultBox /> : <EmptyResultBox />}
-					</ScrollArea>
+				<div className="flex flex-col p-4 rounded-lg border gap-2">
+					<h1 className="text-lg">Search results</h1>
+					{/* <ResultBox /> */}
+					{hasLoadedRef.current ? <ResultBox /> : <EmptyResultBox />}
 				</div>
 			</div>
 		</ScrollArea>

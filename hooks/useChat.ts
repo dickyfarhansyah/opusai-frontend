@@ -1,5 +1,6 @@
 import * as React from "react";
-import ChatMessageType, {
+import type {
+	ChatMessageType,
 	ChatCompletionData,
 	ChatStartData,
 	ChatStatusData,
@@ -362,6 +363,7 @@ export function useSendMessage() {
 	const setIsProcessing = messageStore((state) => state.setIsProcessing);
 	const router = useRouter();
 	const setIsStreaming = useSetIsStreaming();
+	const files = useGetFiles();
 
 	const sendMessage = React.useCallback(
 		async (message: string, stream: boolean = true) => {
@@ -385,6 +387,7 @@ export function useSendMessage() {
 					role: "user",
 					message,
 					id: tempUserMsgId,
+					references: files.map((e) => ({ file: e })),
 				});
 
 				const result = await sendChatMessage(
@@ -439,6 +442,7 @@ export function useSendMessage() {
 			setIsProcessing,
 			router,
 			appendError,
+			files,
 		],
 	);
 	return sendMessage;

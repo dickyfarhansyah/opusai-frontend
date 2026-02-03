@@ -7,7 +7,7 @@ import {
 	HoverCardContent,
 	HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { File } from "lucide-react";
+import { BookOpenCheckIcon, FileUpIcon, Table2Icon } from "lucide-react";
 import type { RefType } from "@/lib/type/chat_message";
 import { memo, useEffect, useState } from "react";
 import {
@@ -20,6 +20,7 @@ import { useFetchChunk } from "@/hooks/useRag";
 import { Spinner } from "@/components/ui/spinner";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { PDFViewer } from "@/components/ui/pdf-reader";
 
 const FileReference = memo(function FileReference({
 	reference,
@@ -30,6 +31,11 @@ const FileReference = memo(function FileReference({
 }) {
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const baseButtonStyle = "rounded-full mx-auto my-auto h-6 w-6";
+	const icon = {
+		tabular: <Table2Icon className="h-4 w-4" />,
+		uploaded_file: <FileUpIcon className="h-4 w-4" />,
+		knowledge_base: <BookOpenCheckIcon className="h-4 w-4" />,
+	};
 
 	return (
 		<>
@@ -47,7 +53,7 @@ const FileReference = memo(function FileReference({
 						variant={"ghost"}
 						onClick={() => setOpenModal(true)}
 					>
-						<File className="h-4 w-4" />
+						{icon[reference.source_type]}
 					</Button>
 				</HoverCardTrigger>
 				<HoverCardContent className="w-80">
@@ -132,4 +138,30 @@ function FileReferenceModal({
 	);
 }
 
-export { FileReference };
+const UserFileReference = memo(function UserFileReference() {
+	return null;
+});
+
+function UserFileReferenceModal({
+	file,
+	open,
+	onOpenChange,
+}: {
+	file: File;
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+}) {
+	// const [isLoading, setIsLoading] = useState<boolean>(false)
+	return (
+		<Dialog open={open} onOpenChange={onOpenChange}>
+			<DialogContent className="flex flex-col h-6/12 lg:h-10/12">
+				<DialogTitle className="text-xl h-fit">{file.name}</DialogTitle>
+				<div className="flex-1 flex">
+					<PDFViewer file={file} />
+				</div>
+			</DialogContent>
+		</Dialog>
+	);
+}
+
+export { FileReference, UserFileReference, UserFileReferenceModal };

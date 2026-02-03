@@ -1,4 +1,4 @@
-import { BASE_URL } from "../config/constants";
+// import { BASE_URL } from "../config/constants";
 import { ModelType } from "../type/model";
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -15,7 +15,8 @@ export interface ModelsResponseSchema {
 }
 
 export function fetchModels(): Promise<ModelType[]> {
-	const url = BASE_URL + "api/models";
+	// const url = BASE_URL + "api/models";
+	const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/models`;
 	return (
 		fetch(url, { method: "GET" })
 			.then((res) => {

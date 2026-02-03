@@ -1,4 +1,4 @@
-import { BASE_URL } from "../config/constants";
+// import { BASE_URL } from "../config/constants";
 
 interface ChunkResponseSchema {
 	id: string;
@@ -10,7 +10,7 @@ interface ChunkResponseSchema {
 }
 
 export function fetchChunk(chunkId: string) {
-	const url = `${BASE_URL}api/vectors/parents/${chunkId}`;
+	const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/vectors/parents/${chunkId}`;
 	return fetch(url, {
 		method: "GET",
 	})

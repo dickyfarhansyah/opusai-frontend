@@ -1,11 +1,11 @@
-import { BASE_URL } from "../config/constants";
+// import { BASE_URL } from "../config/constants";
 import type {
 	FetchSmartSearchSchemaResponse,
 	SmartSearchResponse,
 } from "../type/smartsearch";
 
 export function fetchSmartSearchSchema(): Promise<FetchSmartSearchSchemaResponse> {
-	const url = `${BASE_URL}extraction/schema`;
+	const url = `${process.env.NEXT_PUBLIC_BASE_URL}/extraction/schema`;
 	console.log("am i running?");
 	return fetch(url, { method: "GET" })
 		.then((res) => {
@@ -29,7 +29,7 @@ export function smartSearch(
 	const params = new URLSearchParams({
 		query: search_query,
 	});
-	const url = `${BASE_URL}api/search?${params}`;
+	const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/search?${params}`;
 
 	return fetch(url, {
 		method: "GET",

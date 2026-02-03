@@ -2,23 +2,26 @@
 /** biome-ignore-all lint/security/noDangerouslySetInnerHtmlWithChildren: <meilisearch marks> */
 import { useGetSearchHits } from "@/hooks/useSmartsearch";
 import { getDynamicFields } from "@/lib/utils";
+import { useMemo } from "react";
+import { ScrollArea } from "../ui/scroll-area";
 
-export function EmptyResultBox() {
+export function EmptyResultBox({ text }: { text?: string }) {
 	return (
-		<div className="flex flex-col p-8 rounded-xl border-2 border-dashed items-center justify-center h-full w-full">
-			<h1 className="text-xl text-muted-foreground text-balance">
-				Search results will appear here
-			</h1>
+		<div className="h-96">
+			<div className="flex flex-col p-8 rounded-xl border-2 border-dashed items-center justify-center w-full h-full">
+				<h1 className="text-xl text-muted-foreground text-balance">
+					{text || "Search results will appear here"}
+				</h1>
+			</div>
 		</div>
 	);
 }
 
 export function ResultBox() {
 	const hits = useGetSearchHits();
-
-	return (
-		<div className="flex flex-col gap-4 p-4">
-			{hits.map((e) => {
+	const memoizedHits = useMemo(
+		() =>
+			hits.map((e) => {
 				const dynamicFields = getDynamicFields(e._formatted);
 
 				return (
@@ -32,14 +35,26 @@ export function ResultBox() {
 						/>
 						{dynamicFields.map(([key, value]) => (
 							<p
-								key={key}
+								key={crypto.randomUUID()}
 								className="text-xs text-balance"
 								dangerouslySetInnerHTML={{ __html: `${key}: ${String(value)}` }}
 							/>
 						))}
 					</div>
 				);
-			})}
+			}),
+		[hits],
+	);
+
+	return (
+		<div className="h-96">
+			{hits.length > 0 ? (
+				<ScrollArea className="h-full w-full">
+					<div className="flex flex-col space-y-4 p-4">{memoizedHits}</div>
+				</ScrollArea>
+			) : (
+				<EmptyResultBox text="No files matched!" />
+			)}
 		</div>
 	);
 }

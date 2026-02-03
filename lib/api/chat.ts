@@ -6,7 +6,7 @@ import type {
 	ChatStatusData,
 	ToolChoiceType,
 } from "../type/chat_message";
-import { BASE_URL } from "../config/constants";
+// import { BASE_URL } from "../config/constants";
 
 export interface ChatResponseSchema {
 	conversation_id: string;
@@ -60,7 +60,8 @@ export async function fetchChat({
 	onComplete?: (data: ChatCompletionData) => void;
 	onError?: (error: string) => void;
 }): Promise<ChatCompletionData | ChatResponseSchema | null> {
-	const url = BASE_URL + "api/chat";
+	// const url = BASE_URL + "api/chat";
+	const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/chat`;
 	const body = {
 		conversation_id,
 		query,
