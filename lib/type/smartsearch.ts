@@ -25,6 +25,7 @@ export interface FetchSmartSearchSchemaResponse {
 export interface SearchEngineHit {
 	id_primaryKey: string;
 	grup: string;
+	filename: string;
 	[key: string]: unknown;
 }
 
