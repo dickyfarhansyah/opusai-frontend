@@ -6,7 +6,6 @@ import type {
 
 export function fetchSmartSearchSchema(): Promise<FetchSmartSearchSchemaResponse> {
 	const url = `${process.env.NEXT_PUBLIC_BASE_URL}/extraction/schema`;
-	console.log("am i running?");
 	return fetch(url, { method: "GET" })
 		.then((res) => {
 			if (!res.ok) {

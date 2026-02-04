@@ -11,6 +11,7 @@ export function getDynamicFields(hit: SearchEngineHit) {
 		"id_primaryKey",
 		"id_PrimaryKey",
 		"grup",
+		"filename",
 	];
 	return Object.entries(hit).filter(([key]) => !knownKeys.includes(key));
 }
