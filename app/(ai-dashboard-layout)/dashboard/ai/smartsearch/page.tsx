@@ -1,19 +1,31 @@
 "use client";
 
+import { SchemaFieldCard } from "@/components/dashboard/ai/smartsearch/create/field-create";
+import { SchemaGroupCard } from "@/components/dashboard/ai/smartsearch/create/group-create";
 import DashboardSmartsearchViewTable from "@/components/dashboard/ai/smartsearch/view-datatable/datatable";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useLoadSmartSearchSchemas } from "@/hooks/useSmartsearch";
-import { CircleQuestionMarkIcon, PlusCircleIcon } from "lucide-react";
-import { useEffect } from "react";
+import {
+	useLoadSmartSearchSchemas,
+	useSmartSearchSchemaGroups,
+} from "@/hooks/useSmartsearch";
+import { CircleQuestionMarkIcon, PlusCircleIcon, XIcon } from "lucide-react";
+import { useEffect, useMemo } from "react";
 
 export default function DashboardAISmartsearchPage() {
 	const loadSchemas = useLoadSmartSearchSchemas();
+	const groups = useSmartSearchSchemaGroups();
 
 	useEffect(() => {
 		loadSchemas();
 	}, [loadSchemas]);
+
+	const groupElements = useMemo(() => {
+		return groups.map((group) => {
+			return "yahaha"; //placeholder
+		});
+	}, [groups]);
 
 	return (
 		<div className="flex flex-col px-4 py-2">
@@ -41,6 +53,16 @@ export default function DashboardAISmartsearchPage() {
 						</TabsContent>
 						<TabsContent value="create">
 							<div className="flex flex-col gap-4 py-4">
+								<div className="flex flex-col gap-2 p-2">
+									<SchemaGroupCard />
+									<div className="flex flex-col gap-2 ml-8">
+										<SchemaFieldCard />
+										<SchemaFieldCard />
+										<SchemaFieldCard />
+										<SchemaFieldCard />
+										<SchemaFieldCard />
+									</div>
+								</div>
 								<Button
 									variant={"outline"}
 									size={"sm"}
