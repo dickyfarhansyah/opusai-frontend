@@ -22,8 +22,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-	title: "Opus AI",
-	description: "Made by us for your customized needs",
+	title: "Kartika AI",
+	description: "Made by us for your customized needs. Powered by Opus",
 };
 
 export default function RootLayout({
