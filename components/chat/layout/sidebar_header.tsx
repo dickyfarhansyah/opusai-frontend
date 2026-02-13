@@ -1,21 +1,38 @@
-import { SidebarHeader, SidebarSeparator } from "@/components/ui/sidebar";
+import { SidebarHeader } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import useConversation from "@/hooks/useConversation";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Settings, SquareArrowOutUpRightIcon, Search } from "lucide-react";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
 import { useCreateNewConversation } from "@/hooks/useCreateNewConversation";
+import { useTheme } from "@/hooks/useTheme";
+import { useMemo } from "react";
 
 export default function ChatSidebarHeader() {
-	// const { switchConversation } = useConversation();
-	// const router = useRouter();
-	// const newChatHandler = () => {
-	// 	switchConversation(null);
-	// 	router.push("/chat");
-	// };
 	const newChatHandler = useCreateNewConversation();
+	const theme = useTheme();
+	const imageLogo = useMemo(() => {
+		if (["dark", "monokai", "nord", "dracula"].includes(theme)) {
+			return (
+				<Image
+					src={"/dark-logo.png"}
+					width={240}
+					height={60}
+					className="p-0.5"
+					alt="KartikaAI"
+				/>
+			);
+		}
+		return (
+			<Image
+				src={"/light-logo.png"}
+				width={240}
+				height={60}
+				className="p-0.5"
+				alt="KartikaAI"
+			/>
+		);
+	}, [theme]);
 
 	return (
 		<SidebarHeader>
@@ -25,18 +42,7 @@ export default function ChatSidebarHeader() {
 						<div className="justify-self-start">
 							<Link href={"/"}>
 								<div className="flex flex-row gap-2">
-									<div>
-										<Image
-											src={"/logo_nofont.png"}
-											width={40}
-											height={40}
-											className="p-0.5"
-											alt="OpusAI"
-										/>
-									</div>
-									<div>
-										<h1>OpusAI</h1>
-									</div>
+									<div>{imageLogo}</div>
 								</div>
 							</Link>
 						</div>
