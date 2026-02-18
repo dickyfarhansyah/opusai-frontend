@@ -96,3 +96,52 @@ export function useSmartSearchSchemaDeleteField() {
 export function useSmartSearchSchemaSave() {
 	return smartSearchSchemaCreateStore((state) => state.saveSchema);
 }
+
+export function useSmartSearchSchemaErrors() {
+	return smartSearchSchemaCreateStore((state) => state.errors);
+}
+
+export function useSmartSearchSchemaSetGroupError() {
+	return smartSearchSchemaCreateStore((state) => state.setGroupError);
+}
+
+export function useSmartSearchSchemaClearGroupError() {
+	return smartSearchSchemaCreateStore((state) => state.clearGroupError);
+}
+
+export function useSmartSearchSchemaClearGroupErrors() {
+	return smartSearchSchemaCreateStore((state) => state.clearGroupErrors);
+}
+
+export function useSmartSearchSchemaSetFieldError() {
+	return smartSearchSchemaCreateStore((state) => state.setFieldError);
+}
+
+export function useSmartSearchSchemaClearFieldError() {
+	return smartSearchSchemaCreateStore((state) => state.clearFieldError);
+}
+
+export function useSmartSearchSchemaValidateGroup() {
+	return smartSearchSchemaCreateStore((state) => state.validateGroup);
+}
+
+export function useSmartSearchSchemaValidateField() {
+	return smartSearchSchemaCreateStore((state) => state.validateField);
+}
+
+export function useSmartSearchSchemaValidateAll() {
+	return smartSearchSchemaCreateStore((state) => state.validateAll);
+}
+
+export function useSmartSearchSchemaGetGroupErrors(groupId: string) {
+	return smartSearchSchemaCreateStore((state) => state.getGroupErrors(groupId));
+}
+
+export function useSmartSearchSchemaGetFieldErrors(
+	groupId: string,
+	fieldId: string,
+) {
+	return smartSearchSchemaCreateStore((state) =>
+		state.getFieldErrors(groupId, fieldId),
+	);
+}

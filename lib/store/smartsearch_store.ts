@@ -9,6 +9,10 @@ import {
 	type FieldType,
 	FieldTypeValue,
 } from "../type/smartsearch";
+import {
+	FieldSchemaValidation,
+	GroupSchemaValidation,
+} from "../validator/smartsearch-schema/create";
 
 interface SmartsearchStoreState {
 	hits: SearchEngineHits[];
@@ -72,9 +76,158 @@ export const smartSearchSchemaStore = create<SmartSearchSchemaStoreState>(
 	}),
 );
 
+// export const smartSearchSchemaCreateStore =
+// 	create<SmartSearchSchemaCreateStoreState>((set) => ({
+// 		groups: [],
+// 		createGroup: () => {
+// 			const groupId = nanoid();
+// 			const newGroup: SmartSearchGroupInput = {
+// 				id: groupId,
+// 				name: "",
+// 				description: "",
+// 				fields: [],
+// 			};
+// 			set((state) => ({ groups: [newGroup, ...state.groups] }));
+// 			return groupId;
+// 		},
+// 		deleteGroup: (groupId: string) => {
+// 			set((state) => ({
+// 				groups: state.groups.filter((group) => group.id !== groupId),
+// 			}));
+// 		},
+// 		updateGroup: (
+// 			groupId: string,
+// 			updates: Partial<Pick<SmartSearchGroupInput, "description" | "name">>,
+// 		) => {
+// 			set((state) => ({
+// 				groups: state.groups.map((group) =>
+// 					group.id === groupId ? { ...group, ...updates } : group,
+// 				),
+// 			}));
+// 		},
+// 		createField: (groupId: string) => {
+// 			const fieldId = nanoid();
+// 			const firstTypeValue = FieldTypeValue[0];
+// 			const newField: SmartSearchFieldInput = {
+// 				id: fieldId,
+// 				name: "",
+// 				description: "",
+// 				type: firstTypeValue,
+// 			};
+// 			set((state) => ({
+// 				groups: state.groups.map((group) =>
+// 					group.id === groupId
+// 						? { ...group, fields: [...group.fields, newField] }
+// 						: group,
+// 				),
+// 			}));
+// 			return fieldId;
+// 		},
+// 		deleteField: (groupId: string, fieldId: string) => {
+// 			set((state) => ({
+// 				groups: state.groups.map((group) =>
+// 					group.id === groupId
+// 						? {
+// 								...group,
+// 								fields: group.fields.filter((field) => field.id !== fieldId),
+// 							}
+// 						: group,
+// 				),
+// 			}));
+// 		},
+// 		updateField: (
+// 			groupId: string,
+// 			fieldId: string,
+// 			updates: Partial<
+// 				Pick<SmartSearchFieldInput, "description" | "name" | "type">
+// 			>,
+// 		) => {
+// 			set((state) => ({
+// 				groups: state.groups.map((group) =>
+// 					group.id === groupId
+// 						? {
+// 								...group,
+// 								fields: group.fields.map((field) =>
+// 									field.id === fieldId ? { ...field, ...updates } : field,
+// 								),
+// 							}
+// 						: group,
+// 				),
+// 			}));
+// 		},
+// 		saveSchema: async (groups: SmartSearchGroupInput) => {
+// 			console.log("Received group with this schema", groups);
+// 		},
+// 	}));
+
+type GroupErrorKey = "name" | "description";
+type FieldErrorKey = "name" | "description" | "type";
+
+interface FieldErrors {
+	name?: string;
+	description?: string;
+	type?: string;
+}
+
+interface GroupErrors {
+	name?: string;
+	description?: string;
+	fields?: Record<string, FieldErrors>; // fieldId -> errors
+}
+
+interface SmartSearchSchemaCreateStoreState {
+	groups: SmartSearchGroupInput[];
+	errors: Record<string, GroupErrors>; // groupId -> GroupErrors
+
+	// Existing methods
+	createGroup: () => string;
+	deleteGroup: (groupId: string) => void;
+	updateGroup: (
+		groupId: string,
+		updates: Partial<Pick<SmartSearchGroupInput, "description" | "name">>,
+	) => void;
+	createField: (groupId: string) => string;
+	deleteField: (groupId: string, fieldId: string) => void;
+	updateField: (
+		groupId: string,
+		fieldId: string,
+		updates: Partial<
+			Pick<SmartSearchFieldInput, "description" | "name" | "type">
+		>,
+	) => void;
+	saveSchema: (groups: SmartSearchGroupInput) => Promise<void>;
+
+	// Error management
+	setGroupError: (
+		groupId: string,
+		field: GroupErrorKey,
+		message: string,
+	) => void;
+	clearGroupError: (groupId: string, field: GroupErrorKey) => void;
+	setFieldError: (
+		groupId: string,
+		fieldId: string,
+		field: FieldErrorKey,
+		message: string,
+	) => void;
+	clearFieldError: (
+		groupId: string,
+		fieldId: string,
+		field: FieldErrorKey,
+	) => void;
+	clearGroupErrors: (groupId: string) => void;
+	validateGroup: (groupId: string) => boolean; // Validates group-level fields only
+	validateField: (groupId: string, fieldId: string) => boolean;
+	validateAll: () => boolean; // Validates everything before save
+	getGroupErrors: (groupId: string) => GroupErrors | undefined;
+	getFieldErrors: (groupId: string, fieldId: string) => FieldErrors | undefined;
+}
+
 export const smartSearchSchemaCreateStore =
-	create<SmartSearchSchemaCreateStoreState>((set) => ({
+	create<SmartSearchSchemaCreateStoreState>((set, get) => ({
 		groups: [],
+		errors: {},
+
 		createGroup: () => {
 			const groupId = nanoid();
 			const newGroup: SmartSearchGroupInput = {
@@ -86,21 +239,25 @@ export const smartSearchSchemaCreateStore =
 			set((state) => ({ groups: [newGroup, ...state.groups] }));
 			return groupId;
 		},
+
 		deleteGroup: (groupId: string) => {
-			set((state) => ({
-				groups: state.groups.filter((group) => group.id !== groupId),
-			}));
+			set((state) => {
+				// Remove group
+				const newGroups = state.groups.filter((group) => group.id !== groupId);
+				// Remove all errors for this group
+				const { [groupId]: _, ...remainingErrors } = state.errors;
+				return { groups: newGroups, errors: remainingErrors };
+			});
 		},
-		updateGroup: (
-			groupId: string,
-			updates: Partial<Pick<SmartSearchGroupInput, "description" | "name">>,
-		) => {
+
+		updateGroup: (groupId, updates) => {
 			set((state) => ({
 				groups: state.groups.map((group) =>
 					group.id === groupId ? { ...group, ...updates } : group,
 				),
 			}));
 		},
+
 		createField: (groupId: string) => {
 			const fieldId = nanoid();
 			const firstTypeValue = FieldTypeValue[0];
@@ -119,25 +276,40 @@ export const smartSearchSchemaCreateStore =
 			}));
 			return fieldId;
 		},
+
 		deleteField: (groupId: string, fieldId: string) => {
-			set((state) => ({
-				groups: state.groups.map((group) =>
+			set((state) => {
+				// Update groups
+				const newGroups = state.groups.map((group) =>
 					group.id === groupId
 						? {
 								...group,
 								fields: group.fields.filter((field) => field.id !== fieldId),
 							}
 						: group,
-				),
-			}));
+				);
+
+				// Clean up field errors
+				const groupErrors = state.errors[groupId];
+				if (groupErrors?.fields?.[fieldId]) {
+					const { [fieldId]: _, ...remainingFieldErrors } = groupErrors.fields;
+					return {
+						groups: newGroups,
+						errors: {
+							...state.errors,
+							[groupId]: {
+								...groupErrors,
+								fields: remainingFieldErrors,
+							},
+						},
+					};
+				}
+
+				return { groups: newGroups };
+			});
 		},
-		updateField: (
-			groupId: string,
-			fieldId: string,
-			updates: Partial<
-				Pick<SmartSearchFieldInput, "description" | "name" | "type">
-			>,
-		) => {
+
+		updateField: (groupId, fieldId, updates) => {
 			set((state) => ({
 				groups: state.groups.map((group) =>
 					group.id === groupId
@@ -151,5 +323,194 @@ export const smartSearchSchemaCreateStore =
 				),
 			}));
 		},
-		saveSchema: async (groups: SmartSearchGroupInput) => {},
+
+		// Error Management Implementation
+		setGroupError: (groupId, field, message) => {
+			set((state) => ({
+				errors: {
+					...state.errors,
+					[groupId]: {
+						...state.errors[groupId],
+						[field]: message,
+					},
+				},
+			}));
+		},
+
+		clearGroupError: (groupId, field) => {
+			set((state) => {
+				const groupErrors = state.errors[groupId];
+				if (!groupErrors) return state;
+
+				const newGroupErrors = { ...groupErrors };
+				delete newGroupErrors[field];
+
+				// Clean up empty group errors object
+				if (
+					Object.keys(newGroupErrors).length === 0 ||
+					(Object.keys(newGroupErrors).length === 1 &&
+						newGroupErrors.fields &&
+						Object.keys(newGroupErrors.fields).length === 0)
+				) {
+					const { [groupId]: _, ...rest } = state.errors;
+					return { errors: rest };
+				}
+
+				return {
+					errors: {
+						...state.errors,
+						[groupId]: newGroupErrors,
+					},
+				};
+			});
+		},
+
+		setFieldError: (groupId, fieldId, field, message) => {
+			set((state) => ({
+				errors: {
+					...state.errors,
+					[groupId]: {
+						...state.errors[groupId],
+						fields: {
+							...state.errors[groupId]?.fields,
+							[fieldId]: {
+								...state.errors[groupId]?.fields?.[fieldId],
+								[field]: message,
+							},
+						},
+					},
+				},
+			}));
+		},
+
+		clearFieldError: (groupId, fieldId, field) => {
+			set((state) => {
+				const fieldErrors = state.errors[groupId]?.fields?.[fieldId];
+				if (!fieldErrors) return state;
+
+				const newFieldErrors = { ...fieldErrors };
+				delete newFieldErrors[field];
+
+				// Clean up empty field errors
+				const groupFields = state.errors[groupId]?.fields;
+				if (Object.keys(newFieldErrors).length === 0) {
+					const { [fieldId]: _, ...remainingFields } = groupFields || {};
+					return {
+						errors: {
+							...state.errors,
+							[groupId]: {
+								...state.errors[groupId],
+								fields: remainingFields,
+							},
+						},
+					};
+				}
+
+				return {
+					errors: {
+						...state.errors,
+						[groupId]: {
+							...state.errors[groupId],
+							fields: {
+								...groupFields,
+								[fieldId]: newFieldErrors,
+							},
+						},
+					},
+				};
+			});
+		},
+
+		clearGroupErrors: (groupId) => {
+			set((state) => {
+				const { [groupId]: _, ...rest } = state.errors;
+				return { errors: rest };
+			});
+		},
+
+		// Validation Methods
+		validateGroup: (groupId) => {
+			const group = get().groups.find((g) => g.id === groupId);
+			if (!group) return false;
+
+			const GroupSchema = GroupSchemaValidation.pick({
+				name: true,
+				description: true,
+			});
+			const result = GroupSchema.safeParse({
+				name: group.name,
+				description: group.description,
+			});
+
+			if (!result.success) {
+				result.error.issues.forEach((issue) => {
+					const field = issue.path[0] as GroupErrorKey;
+					get().setGroupError(groupId, field, issue.message);
+				});
+				return false;
+			}
+
+			// Clear existing group-level errors if valid
+			get().clearGroupError(groupId, "name");
+			get().clearGroupError(groupId, "description");
+			return true;
+		},
+
+		validateField: (groupId, fieldId) => {
+			const group = get().groups.find((g) => g.id === groupId);
+			const field = group?.fields.find((f) => f.id === fieldId);
+			if (!field) return false;
+
+			const FieldSchema = FieldSchemaValidation.pick({
+				name: true,
+				description: true,
+				type: true,
+			});
+			const result = FieldSchema.safeParse(field);
+
+			if (!result.success) {
+				result.error.issues.forEach((issue) => {
+					const fieldKey = issue.path[0] as FieldErrorKey;
+					get().setFieldError(groupId, fieldId, fieldKey, issue.message);
+				});
+				return false;
+			}
+
+			// Clear errors for this field
+			["name", "description", "type"].forEach((key) => {
+				get().clearFieldError(groupId, fieldId, key as FieldErrorKey);
+			});
+			return true;
+		},
+
+		validateAll: () => {
+			const { groups } = get();
+			let isValid = true;
+
+			groups.forEach((group) => {
+				const groupValid = get().validateGroup(group.id);
+				if (!groupValid) isValid = false;
+
+				group.fields.forEach((field) => {
+					const fieldValid = get().validateField(group.id, field.id);
+					if (!fieldValid) isValid = false;
+				});
+			});
+
+			return isValid;
+		},
+
+		getGroupErrors: (groupId) => get().errors[groupId],
+		getFieldErrors: (groupId, fieldId) =>
+			get().errors[groupId]?.fields?.[fieldId],
+
+		saveSchema: async () => {
+			const isValid = get().validateAll();
+			if (!isValid) {
+				throw new Error("Validation failed");
+			}
+			const { groups } = get();
+			console.log("Saving schema", groups);
+			// await api.save(groups);
+		},
 	}));

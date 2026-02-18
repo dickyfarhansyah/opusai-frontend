@@ -1,30 +1,38 @@
 "use client";
 
-import { SchemaFieldCard } from "@/components/dashboard/ai/smartsearch/create/field-create";
-import { SchemaGroupCard } from "@/components/dashboard/ai/smartsearch/create/group-create";
+import {
+	SchemaFieldCard,
+	SchemaGroupCard,
+	SchemaWrapper,
+} from "@/components/dashboard/ai/smartsearch";
+// import { SchemaGroupCard } from "@/components/dashboard/ai/smartsearch";
+// import { SchemaWrapper } from "@/components/dashboard/ai/smartsearch/create/create-wrapper";
 import DashboardSmartsearchViewTable from "@/components/dashboard/ai/smartsearch/view-datatable/datatable";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
 	useLoadSmartSearchSchemas,
+	useSmartSearchSchemaCreateGroup,
 	useSmartSearchSchemaGroups,
 } from "@/hooks/useSmartsearch";
+import { group } from "console";
 import { CircleQuestionMarkIcon, PlusCircleIcon, XIcon } from "lucide-react";
 import { useEffect, useMemo } from "react";
 
 export default function DashboardAISmartsearchPage() {
 	const loadSchemas = useLoadSmartSearchSchemas();
 	const groups = useSmartSearchSchemaGroups();
+	const createGroup = useSmartSearchSchemaCreateGroup();
 
 	useEffect(() => {
 		loadSchemas();
 	}, [loadSchemas]);
 
 	const groupElements = useMemo(() => {
-		return groups.map((group) => {
-			return "yahaha"; //placeholder
-		});
+		return groups.map((group) => (
+			<SchemaWrapper key={`wrapper-${group.id}`} group={group} />
+		));
 	}, [groups]);
 
 	return (
@@ -53,22 +61,17 @@ export default function DashboardAISmartsearchPage() {
 						</TabsContent>
 						<TabsContent value="create">
 							<div className="flex flex-col gap-4 py-4">
-								<div className="flex flex-col gap-2 p-2">
-									<SchemaGroupCard />
-									<div className="flex flex-col gap-2 ml-8">
-										<SchemaFieldCard />
-										<SchemaFieldCard />
-										<SchemaFieldCard />
-										<SchemaFieldCard />
-										<SchemaFieldCard />
-									</div>
-								</div>
+								{groupElements}
 								<Button
 									variant={"outline"}
 									size={"sm"}
-									className="w-48 text-xs md:w-56 md:text-base "
+									className="w-48 text-xs md:w-56 md:text-base"
+									onClick={() => {
+										createGroup();
+									}}
 								>
-									<PlusCircleIcon className="h-4 w-4" /> Create group schema
+									<PlusCircleIcon className="h-4 w-4" />
+									{groups.length > 0 ? "Add new group" : "Create group"}
 								</Button>
 							</div>
 						</TabsContent>
