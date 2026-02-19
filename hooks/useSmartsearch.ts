@@ -145,3 +145,11 @@ export function useSmartSearchSchemaGetFieldErrors(
 		state.getFieldErrors(groupId, fieldId),
 	);
 }
+
+export function useSmartSearchSchemaGetIsSaving() {
+	return smartSearchSchemaCreateStore((state) => state.saving);
+}
+
+export function useSmartSearchSchemaSetIsSaving() {
+	return smartSearchSchemaCreateStore((state) => state.setIsSaving);
+}

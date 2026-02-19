@@ -16,6 +16,7 @@ import {
 	useSmartSearchSchemaClearFieldError,
 	useSmartSearchSchemaDeleteField,
 	useSmartSearchSchemaGetFieldErrors,
+	useSmartSearchSchemaGetIsSaving,
 	useSmartSearchSchemaSetFieldError,
 	useSmartSearchSchemaUpdateField,
 } from "@/hooks/useSmartsearch";
@@ -46,6 +47,7 @@ const SchemaFieldCard = memo(
 		const setFieldError = useSmartSearchSchemaSetFieldError();
 		const clearFieldError = useSmartSearchSchemaClearFieldError();
 		const fieldErrors = useSmartSearchSchemaGetFieldErrors(groupId, field.id);
+		const isSaving = useSmartSearchSchemaGetIsSaving();
 
 		const updateFieldNameCallback = useCallback(
 			(e: ChangeEvent<HTMLInputElement>) => {
@@ -145,6 +147,7 @@ const SchemaFieldCard = memo(
 					variant={"ghost"}
 					className="absolute top-1 right-2"
 					onClick={deleteHandler}
+					disabled={isSaving}
 				>
 					<XIcon className="h-4 w-4" />
 				</Button>
@@ -160,6 +163,7 @@ const SchemaFieldCard = memo(
 										id={`field-name-${field.id}`}
 										className={`text-xs ${fieldErrors?.name ? "border-destructive" : ""}`}
 										onChange={updateFieldNameCallback}
+										disabled={isSaving}
 									/>
 								</InputGroup>
 								{fieldErrors?.name && (
@@ -178,6 +182,7 @@ const SchemaFieldCard = memo(
 									<ComboboxInput
 										placeholder="Declare a type"
 										onChange={updateFieldTypeCallback}
+										disabled={isSaving}
 									/>
 									<ComboboxContent>
 										<ComboboxList>
@@ -209,6 +214,7 @@ const SchemaFieldCard = memo(
 							id={`field-description-${field.id}`}
 							className={`text-xs min-h-16 max-h-32 ${fieldErrors?.description ? "border-destructive" : ""}`}
 							onChange={updateFieldDescriptionCallback}
+							disabled={isSaving}
 						/>
 					</InputGroup>
 					{fieldErrors?.description && (

@@ -1,12 +1,6 @@
 "use client";
 
-import {
-	SchemaFieldCard,
-	SchemaGroupCard,
-	SchemaWrapper,
-} from "@/components/dashboard/ai/smartsearch";
-// import { SchemaGroupCard } from "@/components/dashboard/ai/smartsearch";
-// import { SchemaWrapper } from "@/components/dashboard/ai/smartsearch/create/create-wrapper";
+import { SchemaWrapper } from "@/components/dashboard/ai/smartsearch";
 import DashboardSmartsearchViewTable from "@/components/dashboard/ai/smartsearch/view-datatable/datatable";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -16,8 +10,7 @@ import {
 	useSmartSearchSchemaCreateGroup,
 	useSmartSearchSchemaGroups,
 } from "@/hooks/useSmartsearch";
-import { group } from "console";
-import { CircleQuestionMarkIcon, PlusCircleIcon, XIcon } from "lucide-react";
+import { CircleQuestionMarkIcon, PlusCircleIcon } from "lucide-react";
 import { useEffect, useMemo } from "react";
 
 export default function DashboardAISmartsearchPage() {

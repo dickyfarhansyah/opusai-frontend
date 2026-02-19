@@ -1,6 +1,10 @@
 import { nanoid } from "nanoid";
 import { create } from "zustand";
-import { fetchSmartSearchSchema, smartSearch } from "../api/smartsearch";
+import {
+	fetchSmartSearchSchema,
+	smartSearch,
+	smartSearchCreateSchema,
+} from "../api/smartsearch";
 import {
 	type SearchEngineHits,
 	type SmartSearchFieldInput,
@@ -26,25 +30,25 @@ interface SmartSearchSchemaStoreState {
 	loadSchemas: () => Promise<void>;
 }
 
-interface SmartSearchSchemaCreateStoreState {
-	groups: SmartSearchGroupInput[];
-	createGroup: () => string;
-	deleteGroup: (groupId: string) => void;
-	updateGroup: (
-		groupId: string,
-		updates: Partial<Pick<SmartSearchGroupInput, "description" | "name">>,
-	) => void;
-	createField: (groupId: string) => string;
-	deleteField: (groupId: string, fieldId: string) => void;
-	updateField: (
-		groupId: string,
-		fieldId: string,
-		updates: Partial<
-			Pick<SmartSearchFieldInput, "description" | "name" | "type">
-		>,
-	) => void;
-	saveSchema: (groups: SmartSearchGroupInput) => Promise<void>;
-}
+// interface SmartSearchSchemaCreateStoreState {
+// 	groups: SmartSearchGroupInput[];
+// 	createGroup: () => string;
+// 	deleteGroup: (groupId: string) => void;
+// 	updateGroup: (
+// 		groupId: string,
+// 		updates: Partial<Pick<SmartSearchGroupInput, "description" | "name">>,
+// 	) => void;
+// 	createField: (groupId: string) => string;
+// 	deleteField: (groupId: string, fieldId: string) => void;
+// 	updateField: (
+// 		groupId: string,
+// 		fieldId: string,
+// 		updates: Partial<
+// 			Pick<SmartSearchFieldInput, "description" | "name" | "type">
+// 		>,
+// 	) => void;
+// 	saveSchema: (groups: SmartSearchGroupInput) => Promise<void>;
+// }
 
 export const smartSearchStore = create<SmartsearchStoreState>((set, get) => ({
 	hits: [],
@@ -178,7 +182,9 @@ interface GroupErrors {
 interface SmartSearchSchemaCreateStoreState {
 	groups: SmartSearchGroupInput[];
 	errors: Record<string, GroupErrors>; // groupId -> GroupErrors
+	saving: boolean;
 
+	setIsSaving: (e: boolean) => void;
 	// Existing methods
 	createGroup: () => string;
 	deleteGroup: (groupId: string) => void;
@@ -195,7 +201,8 @@ interface SmartSearchSchemaCreateStoreState {
 			Pick<SmartSearchFieldInput, "description" | "name" | "type">
 		>,
 	) => void;
-	saveSchema: (groups: SmartSearchGroupInput) => Promise<void>;
+	// saveSchema: (groups: SmartSearchGroupInput) => Promise<void>;
+	saveSchema: (groupId: string) => Promise<string>;
 
 	// Error management
 	setGroupError: (
@@ -227,7 +234,9 @@ export const smartSearchSchemaCreateStore =
 	create<SmartSearchSchemaCreateStoreState>((set, get) => ({
 		groups: [],
 		errors: {},
+		saving: false,
 
+		setIsSaving: (e: boolean) => set({ saving: e }),
 		createGroup: () => {
 			const groupId = nanoid();
 			const newGroup: SmartSearchGroupInput = {
@@ -504,13 +513,19 @@ export const smartSearchSchemaCreateStore =
 		getFieldErrors: (groupId, fieldId) =>
 			get().errors[groupId]?.fields?.[fieldId],
 
-		saveSchema: async () => {
-			const isValid = get().validateAll();
+		saveSchema: async (groupId: string) => {
+			const isValid = get().validateGroup(groupId);
 			if (!isValid) {
 				throw new Error("Validation failed");
 			}
-			const { groups } = get();
-			console.log("Saving schema", groups);
-			// await api.save(groups);
+			const selectedGroup = get().groups.find((g) => g.id === groupId);
+			if (!selectedGroup) {
+				throw new Error("Group doesnt exists");
+			}
+			console.log("Saving schema", selectedGroup);
+			const result = await smartSearchCreateSchema(selectedGroup);
+			get().deleteGroup(groupId);
+			set({ saving: false }); // no need to check if in saving state as it is already been checked in the component side
+			return result;
 		},
 	}));

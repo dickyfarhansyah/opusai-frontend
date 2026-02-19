@@ -10,6 +10,7 @@ import {
 	useSmartSearchSchemaDeleteGroup,
 	useSmartSearchSchemaErrors,
 	useSmartSearchSchemaGetGroupErrors,
+	useSmartSearchSchemaGetIsSaving,
 	useSmartSearchSchemaSetGroupError,
 	useSmartSearchSchemaUpdateGroup,
 } from "@/hooks/useSmartsearch";
@@ -25,6 +26,7 @@ const SchemaGroupCard = memo(
 		const setGroupError = useSmartSearchSchemaSetGroupError();
 		const clearGroupError = useSmartSearchSchemaClearGroupError();
 		const groupErrors = useSmartSearchSchemaGetGroupErrors(group.id);
+		const isSaving = useSmartSearchSchemaGetIsSaving();
 
 		const updateDescriptionCallback = useCallback(
 			(e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -81,6 +83,7 @@ const SchemaGroupCard = memo(
 					variant={"ghost"}
 					className="absolute top-1 right-2"
 					onClick={deleteCallback}
+					disabled={isSaving}
 				>
 					<XIcon className="h-4 w-4" />
 				</Button>
@@ -93,6 +96,7 @@ const SchemaGroupCard = memo(
 						className={`text-xs ${groupErrors?.name ? "border-destructive" : ""}`}
 						value={group.name}
 						onChange={updateNameCallback}
+						disabled={isSaving}
 					/>
 				</InputGroup>
 				{groupErrors?.name && (
@@ -109,6 +113,7 @@ const SchemaGroupCard = memo(
 						className="min-h-16 max-h-32 text-xs"
 						value={group.description}
 						onChange={updateDescriptionCallback}
+						disabled={isSaving}
 					/>
 				</InputGroup>
 				{groupErrors?.description && (

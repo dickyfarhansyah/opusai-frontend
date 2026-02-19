@@ -47,11 +47,19 @@ export interface SmartSearchGroupInput
 	fields: SmartSearchFieldInput[];
 }
 
+export interface SmartSearchGroupInputNoId
+	extends Omit<SmartSearchGroupInput, "id" | "fields"> {
+	fields: SmartSearchFieldInputNoId[];
+}
+
 export interface SmartSearchFieldInput
 	extends Pick<
 		SmartSearchFieldSchema,
 		"name" | "description" | "type" | "id"
 	> {}
+
+export interface SmartSearchFieldInputNoId
+	extends Omit<SmartSearchFieldInput, "id"> {}
 
 export interface SmartSearchCreateSchemaRequest
 	extends Pick<SmartSearchGroupSchema, "name" | "description">,

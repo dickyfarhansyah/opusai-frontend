@@ -3,6 +3,8 @@ import { json } from "zod";
 import type {
 	FetchSmartSearchSchemaResponse,
 	SmartSearchCreateSchemaRequest,
+	SmartSearchGroupInput,
+	SmartSearchGroupInputNoId,
 	SmartSearchResponse,
 } from "../type/smartsearch";
 
@@ -51,10 +53,15 @@ export function smartSearch(
 }
 
 export function smartSearchCreateSchema(
-	group: SmartSearchCreateSchemaRequest,
+	group: SmartSearchGroupInput,
 ): Promise<string> {
 	const url = `${process.env.NEXT_PUBLIC_BASE_URL}/extraction/schema/create/new`;
-	const body = JSON.stringify(group);
+	const { fields, ...groups } = stripId(group);
+	const formattedGroup = {
+		group: groups,
+		fields,
+	};
+	const body = JSON.stringify(formattedGroup);
 	return fetch(url, {
 		method: "POST",
 		headers: {
@@ -69,6 +76,16 @@ export function smartSearchCreateSchema(
 			return res.json();
 		})
 		.then((data: { message: string }) => {
-			return data.message;
+			return data?.message || "Schema created";
 		});
+}
+
+// util function to strip id
+function stripId(group: SmartSearchGroupInput): SmartSearchGroupInputNoId {
+	const { id, ...noId } = group;
+
+	return {
+		...noId,
+		fields: group.fields.map(({ id, ...field }) => field),
+	};
 }
