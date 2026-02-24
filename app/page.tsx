@@ -19,7 +19,7 @@ export default function Home() {
 		<div className="flex flex-col h-screen w-screen justify-center items-center">
 			<div className="h-24">
 				<h1 className="font-bold tracking-wide dark:text-zinc-50 text-6xl">
-					OpusAI
+					kartika.AI
 				</h1>
 			</div>
 			<div className="h-12">
