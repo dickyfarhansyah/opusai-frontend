@@ -112,12 +112,15 @@ export const UserChatFile = memo(function UserChatFile({
 	return (
 		<>
 			<Button
-				className="h-6 max-w-48 w-fit rounded-lg hover:bg-none text-sm cursor-pointer truncate"
-				variant={"ghost"}
+				className="h-14 max-w-48 w-fit rounded-lg hover:bg-none text-sm cursor-pointer truncate"
+				variant={"outline"}
 				size={"sm"}
 				onClick={clickHandler}
 			>
-				<FileIcon className="h-4 w-4" /> {file.name}
+				<div className="flex items-center gap-2 min-w-0 w-full">
+					<FileIcon className="h-8 w-8 shrink-0" />
+					<div className="truncate">{file.name}</div>
+				</div>
 			</Button>
 			{open && (
 				<UserFileReferenceModal
