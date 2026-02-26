@@ -47,3 +47,46 @@ export async function fetchPdf(filename: string) {
 
 	return blob;
 }
+
+export async function insertKnowledge(
+	files: File[],
+	use_gpu: boolean = false,
+	smartsearch: boolean = false,
+) {
+	const params = new URLSearchParams({
+		use_gpu: String(use_gpu),
+		smart_search: String(smartsearch),
+	});
+	const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/documents/insertion?${params}`;
+	const formData = new FormData();
+
+	if (!files || files.length === 0) {
+		throw new Error("Files could not be empty");
+	}
+
+	files.forEach((file) => {
+		formData.append("files", file);
+	});
+
+	try {
+		const response = await fetch(url, {
+			method: "POST",
+			body: formData,
+		});
+
+		if (!response.ok) {
+			const err = await response.json();
+			const errMsg = err.detail?.message || "Files failed to be uploaded";
+			throw new Error(errMsg);
+		}
+		const data = (await response.json()) as {
+			message: string;
+			success_count: number;
+			failed_count: number;
+		};
+		return data;
+	} catch (error) {
+		console.error("Failed to upload files", error);
+		throw error;
+	}
+}
