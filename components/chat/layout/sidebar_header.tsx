@@ -1,7 +1,12 @@
 import { SidebarHeader } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Settings, SquareArrowOutUpRightIcon, Search } from "lucide-react";
+import {
+	Settings,
+	SquareArrowOutUpRightIcon,
+	Search,
+	BookOpenTextIcon,
+} from "lucide-react";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
 import { useCreateNewConversation } from "@/hooks/useCreateNewConversation";
@@ -65,6 +70,15 @@ export default function ChatSidebarHeader() {
 						>
 							<Settings className="h-4 w-4 p-0" />
 							Settings
+						</Button>
+					</Link>
+					<Link href={"/knowledge"}>
+						<Button
+							className="w-full text-md justify-start hover:bg-sidebar-accent hover:text-sidebar-accent-forground"
+							variant="ghost"
+						>
+							<BookOpenTextIcon className="h-4 w-4 p-0" />
+							Knowledge Base
 						</Button>
 					</Link>
 					{/* Commented out for stripped down version */}
