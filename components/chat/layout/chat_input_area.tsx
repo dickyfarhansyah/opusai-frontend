@@ -17,6 +17,7 @@ import { ChatPromptSwitch } from "../input/prompt_switch";
 import { ChatFileContainer } from "../files/files";
 import { Separator } from "@/components/ui/separator";
 import { ChatParameterSettings } from "../input/parameter_settings";
+import { KnowledgeBaseInputToggle } from "../input/knowledge_base_toggle";
 
 export default function ChatInputArea({
 	isRedirect = true,
@@ -64,22 +65,28 @@ export default function ChatInputArea({
 						onChange={(e) => setQuery(e.target.value)}
 						disabled={isThinking}
 					/>
-					<InputGroupAddon align="block-end">
-						<div className="flex items-center h-4 md:gap-2">
+					<InputGroupAddon
+						align="block-end"
+						className="flex items-center justify-between w-full gap-2"
+					>
+						{/* <div className="flex items-center h-4 md:gap-2"> */}
+						<div className="flex items-center h-8 md:gap-2 overflow-x-auto overflow-y-hidden scrollbar-hide flex-nowrap flex-1 min-w-0">
 							<ChatFileUpload />
-							<Separator orientation="vertical" />
+							<Separator orientation="vertical" className="h-4" />
 							<ChatModelSwitch />
-							<Separator orientation="vertical" />
+							<Separator orientation="vertical" className="h-4" />
 							<ChatPromptSwitch />
-							<Separator orientation="vertical" />
+							<Separator orientation="vertical" className="h-4" />
 							<ChatParameterSettings />
+							<Separator orientation="vertical" className="h-4" />
+							<KnowledgeBaseInputToggle />
 						</div>
 
 						<InputGroupButton
 							aria-label="send question"
 							title="Send"
 							className="ml-auto"
-							disabled={debouncedQuery === "" || isThinking ? true : false}
+							disabled={debouncedQuery === "" || isThinking}
 							onClick={handle_send_message}
 						>
 							<SendIcon />

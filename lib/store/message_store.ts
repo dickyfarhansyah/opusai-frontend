@@ -34,6 +34,7 @@ interface MessageStoreState {
 	files: File[];
 	parameter: ChatParameterSettingsType;
 	isProcessing: boolean;
+	knowledge: boolean;
 	createEmptyMessageForStream: (conversationId: string) => string;
 	updateMessageChunk: ({ id, chunk }: { id: string; chunk: string }) => void;
 	appendMessage: ({
@@ -67,6 +68,7 @@ interface MessageStoreState {
 	uploadFiles: (files: File[]) => Promise<UploadFilesResponseSchema>;
 	clearFiles: () => void;
 	clearMessages: () => void;
+	setKnowledge: (e: boolean) => void;
 }
 
 const appendMessageFunc = ({
@@ -137,6 +139,7 @@ export const messageStore = create<MessageStoreState>()(
 			files: [],
 			parameter: { temperature: 0.7 },
 			isProcessing: false,
+			knowledge: false,
 			updateMessageChunk: ({ id, chunk }: { id: string; chunk: string }) => {
 				set((state) => {
 					return {
@@ -277,6 +280,7 @@ export const messageStore = create<MessageStoreState>()(
 				const data = await uploadFiles(files);
 				return data;
 			},
+			setKnowledge: (e: boolean) => set({ knowledge: e }),
 		}),
 		{
 			name: "chat-storage",

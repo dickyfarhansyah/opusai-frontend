@@ -196,6 +196,7 @@ export function useChatAPI() {
 	const setMessageScratchpad = useSetMessageScratchpad();
 	const setThinkingStatus = useSetIsThinkingStatus();
 	const setIsStreaming = useSetIsStreaming();
+	const knowledge = useKnowledge();
 	const chunkQueueRef = React.useRef<string[]>([]);
 	const processingRef = React.useRef(false);
 	const intervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
@@ -277,7 +278,7 @@ export function useChatAPI() {
 					file_paths: filesData
 						? filesData.files.map((data) => data.file_path)
 						: [],
-					VDB: true,
+					VDB: knowledge,
 					system_prompt_id: prompt_id,
 					temperature: parameter.temperature,
 					stream: true,
@@ -384,6 +385,7 @@ export function useChatAPI() {
 			setIsStreaming,
 			processChunkQueue,
 			setThinkingStatus,
+			knowledge,
 		],
 	);
 	React.useEffect(() => {
@@ -396,6 +398,14 @@ export function useChatAPI() {
 
 export function useUploadFiles() {
 	return messageStore((state) => state.uploadFiles);
+}
+
+export function useKnowledge() {
+	return messageStore((state) => state.knowledge);
+}
+
+export function useSetKnowledge() {
+	return messageStore((state) => state.setKnowledge);
 }
 
 export function useSendMessage() {
