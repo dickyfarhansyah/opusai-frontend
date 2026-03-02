@@ -1,9 +1,11 @@
+/** biome-ignore-all lint/security/noDangerouslySetInnerHtml: Returned by database, should be clear */
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import NextTopLoader from "nextjs-toploader";
 import { Toaster } from "@/components/ui/sonner";
 import ErrorToaster from "@/components/utils/error_toaster";
+import SuccessToaster from "@/components/utils/success-toaster";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -62,6 +64,7 @@ export default function RootLayout({
 				{children}
 				<Toaster />
 				<ErrorToaster />
+				<SuccessToaster />
 			</body>
 		</html>
 	);
