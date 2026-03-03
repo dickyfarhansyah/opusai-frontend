@@ -18,6 +18,7 @@ import {
 	ALLOWED_MIME_CHAT_UPLOAD_FILE,
 	MAX_INSERTION_FILE_SIZE,
 } from "@/lib/config/constants";
+import { useAppendSuccess } from "@/hooks/useSuccess";
 
 const MAX_FILES = 10;
 
@@ -31,6 +32,7 @@ export default function KnowledgeUploadPage() {
 	const appendFile = useAppendInsertionFile();
 	const removeFile = useRemoveInsertionFile();
 	const appendError = useAppendError();
+	const appendSuccess = useAppendSuccess();
 
 	const isLimitReached = files.length >= MAX_FILES;
 	const remainingSlots = MAX_FILES - files.length;
@@ -116,6 +118,7 @@ export default function KnowledgeUploadPage() {
 
 		try {
 			const result = await insertion(false, false);
+			appendSuccess(result.message);
 			resetFiles();
 		} catch (error) {
 			console.error("Upload failed:", error);

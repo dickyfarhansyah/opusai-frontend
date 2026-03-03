@@ -21,6 +21,11 @@ export default function SuccessToaster() {
 						removeSuccess(index);
 						processedSuccess.current.delete(index);
 					},
+					classNames: {
+						toast: "!bg-success-foreground",
+						title: "!text-success !text-md",
+						icon: "!text-success",
+					},
 				});
 			}
 		});

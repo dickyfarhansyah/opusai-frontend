@@ -32,6 +32,10 @@
   --color-border: var(--border);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-error: var(--error);
+  --color-error-foreground: var(--error-foreground);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -73,6 +77,10 @@
   --accent-foreground: oklch(0.28 0.019 249);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
+  --error: oklch(0.577 0.245 27.325);
+  --error-foreground: oklch(0.985 0 0);
+  --success: oklch(0.58 0.16 155);          /* mid-green, cooler to match the blue-ish primary */
+  --success-foreground: oklch(0.98 0.005 155);
   /* --border: oklch(0.922 0 0); */
   --border: oklch(0.7694 0 0);
   --input: oklch(0.922 0 0);
@@ -180,7 +188,13 @@ html.Inter * {
   /* Destructive - Warm red for errors */
   --destructive: oklch(0.62 0.22 25);
   --destructive-foreground: oklch(0.99 0 0);
+
+  --error: oklch(0.62 0.22 25);
+  --error-foreground: oklch(0.99 0 0);
   
+  --success: oklch(0.65 0.18 155);          /* brighter green to pop on dark bg */
+  --success-foreground: oklch(0.15 0.02 155);
+
   /* Borders and inputs */
   --border: oklch(0.38 0.02 270 / 35%);
   --input: oklch(0.34 0.02 270);
@@ -221,6 +235,10 @@ html.Inter * {
   --accent-foreground: oklch(0.298 0.024 254.604);
   --destructive: oklch(0.629 0.149 16.439);
   --destructive-foreground: oklch(0.934 0.011 254.604);
+  --error: oklch(0.629 0.149 16.439);
+  --error-foreground: oklch(0.934 0.011 254.604);
+  --success: oklch(0.748 0.071 142.496);    /* mirrors --chart-4, Nord's own green */
+  --success-foreground: oklch(0.238 0.026 254.604);
   --border: oklch(0.358 0.024 254.604);
   --input: oklch(0.358 0.024 254.604);
   --ring: oklch(0.609 0.088 254.138);
@@ -256,6 +274,10 @@ html.Inter * {
   --accent-foreground: oklch(0.258 0.034 285.885);
   --destructive: oklch(0.739 0.221 12.177);
   --destructive-foreground: oklch(0.961 0.006 109.769);
+  --error: oklch(0.739 0.221 12.177);
+  --error-foreground: oklch(0.961 0.006 109.769);
+  --success: oklch(0.758 0.176 158.463);    /* mirrors --chart-4, Dracula green */
+  --success-foreground: oklch(0.258 0.034 285.885);
   --border: oklch(0.398 0.029 285.885);
   --input: oklch(0.398 0.029 285.885);
   --ring: oklch(0.832 0.189 293.514);
@@ -340,6 +362,12 @@ html.Inter * {
   --destructive: oklch(0.607 0.182 27.325);
   --destructive-foreground: oklch(0.98 0.020 85.87);
   
+  --error: oklch(0.607 0.182 27.325);
+  --error-foreground: oklch(0.98 0.020 85.87);
+
+  --success: oklch(0.478 0.147 142.496);    /* mirrors --chart-3, Solarized green */
+  --success-foreground: oklch(0.98 0.020 85.87);
+
   /* Borders and inputs - Clear boundaries */
   /* --border: oklch(0.84 0.060 85.87); */
   --border: oklch(0.7665 0.113 85.87);
@@ -381,6 +409,10 @@ html.Inter * {
   --accent-foreground: oklch(0.228 0.013 85.87);
   --destructive: oklch(0.678 0.208 27.325);
   --destructive-foreground: oklch(0.961 0.006 109.769);
+  --error: oklch(0.678 0.208 27.325);
+  --error-foreground: oklch(0.961 0.006 109.769);
+  --success: oklch(0.658 0.167 128.216);    /* mirrors --primary / --chart-1, Monokai green */
+  --success-foreground: oklch(0.228 0.013 85.87);
   --border: oklch(0.348 0.013 85.87);
   --input: oklch(0.348 0.013 85.87);
   --ring: oklch(0.658 0.167 128.216);
