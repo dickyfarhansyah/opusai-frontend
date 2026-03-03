@@ -8,30 +8,20 @@ import {
 	SidebarGroupContent,
 	SidebarRail,
 	SidebarTrigger,
-	SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
-import { ReactNode, useEffect, useRef } from "react";
+import { ReactNode, useRef } from "react";
 import ChatSidebarFooter from "@/components/chat/layout/sidebar_footer";
 import ChatSidebarHeader from "@/components/chat/layout/sidebar_header";
 import ChatSidebarContent from "@/components/chat/layout/sidebar_content";
 import { useFetchModels } from "@/hooks/useChat";
 import { useFetchPrompts } from "@/hooks/usePrompt";
-import { useFetchConversations } from "@/hooks/useConversation";
 import { ThemeToggle } from "@/components/utils/theme_change";
-import { useAppendSuccess } from "@/hooks/useSuccess";
 
 export default function ChatLayout({ children }: { children: ReactNode }) {
 	const conversationScrollContainer = useRef<HTMLDivElement>(null);
 	useFetchModels();
 	useFetchPrompts();
-	const appendSuccess = useAppendSuccess();
-
-	useEffect(() => {
-		appendSuccess("testing");
-	}, [appendSuccess]);
-	// useFetchConversations();
-
 	return (
 		<SidebarProvider>
 			<Sidebar>
