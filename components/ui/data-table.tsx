@@ -55,6 +55,8 @@ import {
 } from "./table";
 import useDebounce from "@/hooks/useDebounce";
 import { Spinner } from "./spinner";
+import { useAppendError } from "@/hooks/useError";
+import { useKnowledgeError } from "@/hooks/useRag";
 
 interface DataTableColumnHeaderProps<TData, TValue>
 	extends React.HTMLAttributes<HTMLDivElement> {
@@ -272,14 +274,11 @@ export function DataTablePagination<TData>({
 		: table.getCanNextPage();
 	const isLoading = cursorBased ? (cursorConfig?.isLoading ?? false) : false;
 	const handlePageSizeChange = (value: string) => {
-		console.log(`Printing value ${value}`);
 		const newSize = Number(value);
-		console.log(`printing newSize ${newSize}`);
 		if (cursorBased && cursorConfig?.onPageSizeChange) {
 			cursorConfig.onPageSizeChange(newSize);
-		} else {
-			table.setPageSize(newSize);
 		}
+		table.setPageSize(newSize);
 	};
 
 	return (
@@ -311,7 +310,7 @@ export function DataTablePagination<TData>({
 				</div>
 			</div>
 			<div className="flex">
-				<div className="flex w-[100px] items-center justify-center text-sm font-medium">
+				<div className="flex w-[100px] gap-1 items-center justify-center text-sm font-medium">
 					{cursorBased ? (
 						<span>
 							{cursorConfig?.count ?? table.getRowModel().rows.length} items
@@ -322,6 +321,7 @@ export function DataTablePagination<TData>({
 							{table.getPageCount()}
 						</span>
 					)}
+					{cursorBased && isLoading && <Spinner className="h-4 w-4" />}
 				</div>
 				<div className="flex items-center space-x-2">
 					{!cursorBased && (
@@ -386,135 +386,6 @@ export function DataTablePagination<TData>({
 		</div>
 	);
 }
-
-// export function ComponentDataTable<TData, TValue>({
-// 	columns,
-// 	data,
-// 	enablePagination = false,
-// 	cursorBasedPagination = false,
-// 	cursorConfig = null,
-// 	enableSearch = false,
-// 	enableSorting = false,
-// 	enableSelect = false,
-// 	searchColumn = "",
-// 	searchPlaceholder = "",
-// 	pageSize = 10,
-// 	pageSizeOptions = [10, 20, 30, 40, 50],
-// 	className = "",
-// 	size = "md",
-// }: ComponentDataTableProps<TData, TValue>) {
-// 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-// 	const [sorting, setIsSorting] = useState<SortingState>([]);
-// 	const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-// 	const table = useReactTable({
-// 		data,
-// 		columns,
-// 		getCoreRowModel: getCoreRowModel(),
-// 		...(enablePagination && {
-// 			getPaginationRowModel: getPaginationRowModel(),
-// 			initialState: {
-// 				pagination: {
-// 					pageSize: pageSize,
-// 				},
-// 			},
-// 		}),
-// 		...(cursorBasedPagination && {
-// 			manualPagination: true,
-// 		}),
-// 		...(enableSorting && {
-// 			getSortedRowModel: getSortedRowModel(),
-// 			onColumnFiltersChange: setColumnFilters,
-// 			onSortingChange: setIsSorting,
-// 		}),
-// 		...(enableSearch && {
-// 			getFilteredRowModel: getFilteredRowModel(),
-// 			onColumnFiltersChange: setColumnFilters,
-// 		}),
-// 		...(enableSelect && {
-// 			onRowSelectionChange: setRowSelection,
-// 		}),
-// 		state: {
-// 			...(enableSorting && { sorting }),
-// 			...(enableSearch && { columnFilters }),
-// 			...(enableSelect && { rowSelection }),
-// 		},
-// 	});
-
-// 	return (
-// 		// <div className={cn("flex flex-col gap-2 h-full", className)}>
-// 		<div className={cn("flex flex-col gap-2 h-full min-h-0", className)}>
-// 			{enableSearch && (
-// 				<DataTableSearchInput
-// 					table={table}
-// 					searchColumn={searchColumn}
-// 					placeholder={searchPlaceholder}
-// 				/>
-// 			)}
-// 			<div className="flex-1 min-h-0 border rounded-md">
-// 				<ScrollArea className="h-full">
-// 					<UITable noWrapper size={size}>
-// 						<TableHeader className="sticky top-0 bg-background z-10">
-// 							{table.getHeaderGroups().map((headerGroup) => (
-// 								<TableRow key={headerGroup.id}>
-// 									{headerGroup.headers.map((header) => {
-// 										return (
-// 											<TableHead key={header.id}>
-// 												{header.isPlaceholder
-// 													? null
-// 													: flexRender(
-// 															header.column.columnDef.header,
-// 															header.getContext(),
-// 														)}
-// 											</TableHead>
-// 										);
-// 									})}
-// 								</TableRow>
-// 							))}
-// 						</TableHeader>
-// 						<TableBody>
-// 							{table.getRowModel().rows?.length ? (
-// 								table.getRowModel().rows.map((row) => (
-// 									<TableRow
-// 										key={row.id}
-// 										data-state={row.getIsSelected() && "selected"}
-// 									>
-// 										{row.getVisibleCells().map((cell) => (
-// 											<TableCell key={cell.id}>
-// 												{flexRender(
-// 													cell.column.columnDef.cell,
-// 													cell.getContext(),
-// 												)}
-// 											</TableCell>
-// 										))}
-// 									</TableRow>
-// 								))
-// 							) : (
-// 								<TableRow>
-// 									<TableCell
-// 										colSpan={columns.length}
-// 										className="h-24 text-center"
-// 									>
-// 										No results.
-// 									</TableCell>
-// 								</TableRow>
-// 							)}
-// 						</TableBody>
-// 					</UITable>
-// 				</ScrollArea>
-// 			</div>
-// 			{enablePagination && (
-// 				<DataTablePagination
-// 					table={table}
-// 					enableSelect={enableSelect}
-// 					pageSize={pageSize}
-// 					pageSizeOptions={pageSizeOptions}
-// 					cursorBased={cursorBasedPagination}
-// 					cursorConfig={cursorConfig}
-// 				/>
-// 			)}
-// 		</div>
-// 	);
-// }
 
 export function ComponentDataTable<TData, TValue>({
 	columns,

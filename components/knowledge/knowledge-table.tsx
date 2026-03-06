@@ -5,10 +5,12 @@ import { formattedDateToDDMMYYYY } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { EraserIcon, Eye } from "lucide-react";
 import {
+	useClearKnowledgeError,
 	useDeleteKnowledges,
 	useFetchNextKnowledges,
 	useFetchPreviousKnowledges,
 	useKnowledgeCurrentPage,
+	useKnowledgeError,
 	useKnowledgeHasNext,
 	useKnowledgeHasPrevious,
 	useKnowledgeIsSearching,
@@ -22,7 +24,7 @@ import {
 	useSearchKnowledges,
 	useSetKnowledgePageSize,
 } from "@/hooks/useRag";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAppendError } from "@/hooks/useError";
 import { useAppendSuccess } from "@/hooks/useSuccess";
 import { Spinner } from "../ui/spinner";
@@ -150,28 +152,18 @@ export function KnowledgeManagementTable() {
 	const isSearching = useKnowledgeIsSearching();
 	const searchKnowledges = useSearchKnowledges();
 	const isPageMode = paginationMode === "page";
+	const error = useKnowledgeError();
+	const clearError = useClearKnowledgeError();
+	const appendError = useAppendError();
+	useEffect(() => {
+		if (error) {
+			appendError(error || "Something went wrong, please try again later");
+		}
+		return () => {
+			clearError();
+		};
+	}, [error, appendError, clearError]);
 	return (
-		// <ComponentDataTable
-		// 	size={"sm"}
-		// 	data={knowledges}
-		// 	columns={KnowledgeManagementColumns}
-		// 	enablePagination={true}
-		// 	cursorBasedPagination={true}
-		// 	cursorConfig={{
-		// 		hasNext: hasNext,
-		// 		hasPrevious: hasPrevious,
-		// 		onNext: () => {
-		// 			fetchNext();
-		// 		},
-		// 		onPrevious: () => {
-		// 			fetchPrevious();
-		// 		},
-		// 		onPageSizeChange: (pageSize: number) => {
-		// 			setPageSize(pageSize);
-		// 		},
-		// 		isLoading: isLoading || isLoadingNext || isLoadingPrevious,
-		// 	}}
-		// />
 		<ComponentDataTable
 			size="sm"
 			data={knowledges}
@@ -183,6 +175,10 @@ export function KnowledgeManagementTable() {
 				hasPrevious: isPageMode ? currentPage > 1 : hasPrevious,
 				onNext: fetchNext,
 				onPrevious: fetchPrevious,
+				isLoading: isLoading || isLoadingNext || isLoadingPrevious,
+				onPageSizeChange: (pageSize) => {
+					setPageSize(pageSize);
+				},
 			}}
 			searchPlaceholder="Search file here"
 			enableSearch={true}
