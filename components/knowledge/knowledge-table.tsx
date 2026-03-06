@@ -29,6 +29,17 @@ import { useAppendError } from "@/hooks/useError";
 import { useAppendSuccess } from "@/hooks/useSuccess";
 import { Spinner } from "../ui/spinner";
 import { FileReferenceModal } from "../chat/files/file_reference";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "../ui/alert-dialog";
 
 export const KnowledgeManagementColumns: ColumnDef<knowledgeType>[] = [
 	{
@@ -95,21 +106,39 @@ function KnowledgeTableDeleteButton({ file }: { file: string }) {
 	);
 
 	return (
-		<Button
-			variant={"destructive"}
-			size={"icon-sm"}
-			className="cursor-pointer"
-			disabled={isDeleting}
-			onClick={() => {
-				deleteHandler(file);
-			}}
-		>
-			{isDeleting ? (
-				<Spinner className="h-4 w-4" />
-			) : (
-				<EraserIcon className="h-4 w-4" />
-			)}
-		</Button>
+		<AlertDialog>
+			<AlertDialogTrigger asChild>
+				<Button
+					variant={"destructive"}
+					size={"icon-sm"}
+					className="cursor-pointer"
+					disabled={isDeleting}
+				>
+					{isDeleting ? (
+						<Spinner className="h-4 w-4" />
+					) : (
+						<EraserIcon className="h-4 w-4" />
+					)}
+				</Button>
+			</AlertDialogTrigger>
+			<AlertDialogContent>
+				<AlertDialogHeader>
+					<AlertDialogTitle>Are you sure?</AlertDialogTitle>
+					<AlertDialogDescription>
+						If you delete this knowledge, AI will never refer to this knowledge!
+					</AlertDialogDescription>
+				</AlertDialogHeader>
+				<AlertDialogFooter>
+					<AlertDialogCancel>Cancel</AlertDialogCancel>
+					<AlertDialogAction
+						variant={"destructive"}
+						onClick={() => deleteHandler(file)}
+					>
+						Delete
+					</AlertDialogAction>
+				</AlertDialogFooter>
+			</AlertDialogContent>
+		</AlertDialog>
 	);
 }
 
